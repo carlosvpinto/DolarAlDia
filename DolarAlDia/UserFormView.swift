@@ -18,6 +18,8 @@ struct UserFormView: View {
     var userDataManager = UserDataManager()
     var user: UserData? // Parámetro opcional para editar un usuario existente
     var banks: [String] = ["Banco de Venezuela", "Banesco", "Mercantil", "Bancaribe"] // Puedes personalizar la lista de bancos
+    var onSave: () -> Void // Callback para notificar que se ha guardado un usuario
+
 
     var body: some View {
         Form {
@@ -88,6 +90,9 @@ struct UserFormView: View {
 
         // Cerrar la vista
         presentationMode.wrappedValue.dismiss()
+        // Llamar el callback onSave cuando el usuario se ha guardado
+              onSave()
+        
     }
 
     // Acción de cancelar

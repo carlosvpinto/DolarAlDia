@@ -22,7 +22,7 @@ struct UserListView: View {
                 }
                 .onDelete(perform: deleteUser)
             }
-            .navigationTitle("Lista de Usuarios")
+            .navigationTitle("Pago Movil")
             .onAppear {
                 users = userDataManager.load() // Cargar usuarios
                 selectedUserId = userDataManager.loadDefaultUser()?.id // Cargar usuario predeterminado
