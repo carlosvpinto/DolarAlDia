@@ -7,15 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB251C072D0573270000D82F /* ResultSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C062D0573270000D82F /* ResultSheet.swift */; };
+		DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C0C2D064BAD0000D82F /* MenuView.swift */; };
+		DB251C112D06CFDE0000D82F /* MonitorListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */; };
 		DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */; };
-		DBA82F812CFE44CE004A0C4F /* TextFielView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F802CFE44CE004A0C4F /* TextFielView.swift */; };
+		DBA82F812CFE44CE004A0C4F /* TextFieldPersonal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */; };
 		DBA82F842CFEB876004A0C4F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F832CFEB876004A0C4F /* Model.swift */; };
+		DBC080962D07FC1300BF2923 /* MonitorBcvListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC080952D07FC1300BF2923 /* MonitorBcvListViewModel.swift */; };
+		DBC0809A2D091C7800BF2923 /* LabeledTextFieldWithIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC080992D091C7800BF2923 /* LabeledTextFieldWithIcon.swift */; };
+		DBC0809E2D0920D600BF2923 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC0809D2D0920D600BF2923 /* UserData.swift */; };
+		DBC080A02D09210400BF2923 /* UserDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC0809F2D09210400BF2923 /* UserDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB251C062D0573270000D82F /* ResultSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSheet.swift; sourceTree = "<group>"; };
+		DB251C0C2D064BAD0000D82F /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorListViewModel.swift; sourceTree = "<group>"; };
 		DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotonInfoPrecio.swift; sourceTree = "<group>"; };
-		DBA82F802CFE44CE004A0C4F /* TextFielView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFielView.swift; sourceTree = "<group>"; };
+		DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPersonal.swift; sourceTree = "<group>"; };
 		DBA82F832CFEB876004A0C4F /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		DBC080952D07FC1300BF2923 /* MonitorBcvListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorBcvListViewModel.swift; sourceTree = "<group>"; };
+		DBC080992D091C7800BF2923 /* LabeledTextFieldWithIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledTextFieldWithIcon.swift; sourceTree = "<group>"; };
+		DBC0809D2D0920D600BF2923 /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
+		DBC0809F2D09210400BF2923 /* UserDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataManager.swift; sourceTree = "<group>"; };
 		DBF6672D2CFC369100394884 /* DolarAlDia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DolarAlDia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -41,8 +55,11 @@
 		DBA82F722CFD7296004A0C4F /* Componets */ = {
 			isa = PBXGroup;
 			children = (
+				DB251C0C2D064BAD0000D82F /* MenuView.swift */,
 				DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */,
-				DBA82F802CFE44CE004A0C4F /* TextFielView.swift */,
+				DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */,
+				DB251C062D0573270000D82F /* ResultSheet.swift */,
+				DBC080992D091C7800BF2923 /* LabeledTextFieldWithIcon.swift */,
 			);
 			path = Componets;
 			sourceTree = "<group>";
@@ -51,6 +68,10 @@
 			isa = PBXGroup;
 			children = (
 				DBA82F832CFEB876004A0C4F /* Model.swift */,
+				DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */,
+				DBC080952D07FC1300BF2923 /* MonitorBcvListViewModel.swift */,
+				DBC0809D2D0920D600BF2923 /* UserData.swift */,
+				DBC0809F2D09210400BF2923 /* UserDataManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -147,8 +168,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBC0809A2D091C7800BF2923 /* LabeledTextFieldWithIcon.swift in Sources */,
+				DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */,
+				DB251C072D0573270000D82F /* ResultSheet.swift in Sources */,
+				DB251C112D06CFDE0000D82F /* MonitorListViewModel.swift in Sources */,
 				DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */,
-				DBA82F812CFE44CE004A0C4F /* TextFielView.swift in Sources */,
+				DBC0809E2D0920D600BF2923 /* UserData.swift in Sources */,
+				DBC080A02D09210400BF2923 /* UserDataManager.swift in Sources */,
+				DBC080962D07FC1300BF2923 /* MonitorBcvListViewModel.swift in Sources */,
+				DBA82F812CFE44CE004A0C4F /* TextFieldPersonal.swift in Sources */,
 				DBA82F842CFEB876004A0C4F /* Model.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

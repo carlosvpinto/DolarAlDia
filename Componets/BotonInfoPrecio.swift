@@ -7,9 +7,10 @@
 import SwiftUI
 
 struct BotonInfoPrecio: View {
+    var mostrar: Bool
     var valorDolar: String
     var nombreDolar: String
-    var imagenFlecha: String
+    var simboloFlecha: String
     var variacionPorcentaje: String
     var isSelected: Bool
     var action: () -> Void
@@ -19,6 +20,7 @@ struct BotonInfoPrecio: View {
             Text(nombreDolar)
                 .bold()
                 .font(.title3)
+            
             Button(action: {
                 action() // Ejecutar la acción al presionar el botón
             }, label: {
@@ -31,31 +33,36 @@ struct BotonInfoPrecio: View {
                     .cornerRadius(20)
                     .scaleEffect(isSelected ? 0.95 : 1) // Efecto de presionado
             })
+            
+            // Verificación para mostrar solo si el simboloFlecha no está vacío
+            if mostrar{
+                HStack(spacing: 5) {
+                    // Cambia el color del símbolo según sea ▲ o ▼
+                    Text(simboloFlecha)
+                        .foregroundColor(simboloFlecha == "▲" ? .green : .red)
+                    
+                    Text("\(variacionPorcentaje)%")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                }
+            }
         }
     }
 }
 
 
-struct Counter: View {
-    @State var subscribersNumber = 0
-    
-    var body: some View {
-        Button(action: {
-            subscribersNumber += 1
-        }, label: {
-            Text("Suscriptores: \(subscribersNumber)")
-                .bold()
-                .font(.title)
-                .frame(height: 50)
-                .foregroundColor(.white)
-                .background(.red)
-                .cornerRadius(20)
-                .padding(30)  // Aquí agregas el padding de 30dp
-        })
-    }
+#Preview {
+    BotonInfoPrecio(
+        mostrar: true,
+        valorDolar: "30.00",
+        nombreDolar: "Dolar Bcv",
+        simboloFlecha: "▲",
+        variacionPorcentaje: "0.5",
+        isSelected: true,
+        action: {
+            print("Botón presionado")
+        }
+    )
 }
 
 
-//#Preview {
- //   BotonInfoPrecio(valorDolar:"57", nombreDolar: "Dolar Bcv", imagenFlecha: "arrow.up", variacionPorcentaje: "0,8")
-//}

@@ -11,7 +11,9 @@ import SwiftUI
 struct DolarAlDiaApp: App {
     var body: some Scene {
         WindowGroup {
-            DolarAlDiaView()
+          //  MenuView()
+          //  DolarAlDiaView()
+            ContentView()
         }
     }
 }
