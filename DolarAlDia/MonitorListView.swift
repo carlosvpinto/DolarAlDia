@@ -84,7 +84,7 @@ struct MonitorListView: View {
                         .listStyle(InsetGroupedListStyle()) // Mejor estilo de lista
                     }
                 }
-                .navigationTitle("Valor En Paginas")
+                .navigationTitle("Precio En Paginas")
                 .navigationBarTitleDisplayMode(.inline)
             }
             .onAppear {

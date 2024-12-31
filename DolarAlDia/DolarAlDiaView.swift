@@ -9,10 +9,13 @@ import SwiftUI
 
 
 struct DolarAlDiaView: View {
-    @State private var dolares: String = ""
-    @State private var bolivares: String = ""
-    @State private var tasaBCV: String = ""
-    @State private var tasaParalelo: String = ""
+    @Binding var dolares: String
+    @Binding var bolivares: String
+    @Binding var tasaBCV: String
+    @Binding var tasaParalelo: String
+    @Binding var tasaPromedio: String
+    
+    @Binding var selectedButton: String
     @State private var porcentajeParalelo: String = ""
     @State private var porcentajeBcv: String = ""
     @State private var simboloBcv: String = ""
@@ -21,32 +24,32 @@ struct DolarAlDiaView: View {
     @State private var fechaActualizacionBCV: String = "02/12/2024"
     
     @State private var isLoading: Bool = false
-    @State private var selectedButton: String = "Dolar Bcv"
+    
     @State private var showToast: Bool = false
-
+    
     
     // Estados para controlar el foco de los TextFields
     @FocusState private var isDolaresFocused: Bool // Usamos FocusState para manejar el enfoque
-        @State private var isBolivaresFocused: Bool = false
+    // @State private var isBolivaresFocused: Bool = false
     
-       @State private var cantidadDolares: String = ""
-       @State private var cantidadBolivares: String = ""
-
-        @State private var showSheet = false
-       @State private var mensaje = ""
-       @State private var diferenciaBs = 0.0
-       @State private var diferenciaDolares = 0.0
-       @State private var diferenciaPorcentual = 0.0
+    @State private var cantidadDolares: String = ""
+    @State private var cantidadBolivares: String = ""
+    
+    @State private var showSheet = false
+    @State private var mensaje = ""
+    @State private var diferenciaBs = 0.0
+    @State private var diferenciaDolares = 0.0
+    @State private var diferenciaPorcentual = 0.0
     @State private var isMenuPresented = false
     
     var body: some View {
-     
-            
+        
+        
         ZStack {
            
             VStack(spacing: 20) {
                 
-            
+                
                 VStack(spacing: 10) {
                     let screenWidth = UIScreen.main.bounds.width
                     let padding: CGFloat = 40
@@ -57,8 +60,8 @@ struct DolarAlDiaView: View {
                         .scaledToFit()
                         .frame(width: 80, height: 80)
                     
-                    BotonInfoPrecio(mostrar:false, valorDolar: tasaPromedio(), nombreDolar: "Dolar Promedio", simboloFlecha: "", variacionPorcentaje: "", isSelected: selectedButton == "Dolar Promedio") {
-                        selectedButton = "Dolar Promedio"
+                    BotonInfoPrecio(mostrar:false, valorDolar: funTasaPromedio(), nombreDolar: Constants.DOLARPROMEDIO, simboloFlecha: "", variacionPorcentaje: "", isSelected: selectedButton == Constants.DOLARPROMEDIO) {
+                        selectedButton = Constants.DOLARPROMEDIO
                         convertirDolaresABolivares()
                         convertirBolivaresADolares()
                     }
@@ -66,15 +69,15 @@ struct DolarAlDiaView: View {
                     .frame(maxWidth: buttonWidth)
                     
                     HStack(spacing: 20) {
-                        BotonInfoPrecio(mostrar:true,valorDolar: tasaBCV, nombreDolar: "Dolar Bcv", simboloFlecha: simboloBcv, variacionPorcentaje: porcentajeBcv, isSelected: selectedButton == "Dolar Bcv") {
-                            selectedButton = "Dolar Bcv"
+                        BotonInfoPrecio(mostrar:true,valorDolar: tasaBCV, nombreDolar: Constants.DOLARBCV, simboloFlecha: simboloBcv, variacionPorcentaje: porcentajeBcv, isSelected: selectedButton == Constants.DOLARBCV) {
+                            selectedButton = Constants.DOLARBCV
                             convertirDolaresABolivares()
                             convertirBolivaresADolares()
                         }
                         .frame(maxWidth: buttonWidth)
                         
-                        BotonInfoPrecio(mostrar:true,valorDolar: tasaParalelo, nombreDolar: "Dolar Paralelo", simboloFlecha: simboloParalelo, variacionPorcentaje: porcentajeParalelo, isSelected: selectedButton == "Dolar Paralelo") {
-                            selectedButton = "Dolar Paralelo"
+                        BotonInfoPrecio(mostrar:true,valorDolar: tasaParalelo, nombreDolar: Constants.DOLARPARALELO, simboloFlecha: simboloParalelo, variacionPorcentaje: porcentajeParalelo, isSelected: selectedButton == Constants.DOLARPARALELO) {
+                            selectedButton = Constants.DOLARPARALELO
                             convertirDolaresABolivares()
                             convertirBolivaresADolares()
                         }
@@ -82,12 +85,12 @@ struct DolarAlDiaView: View {
                     }
                     
                     HStack {
-                     
+                        
                         VStack(alignment: .leading, spacing: -10) {
                             HStack {
-                                TextFieldPersonal(placeholder: "Dolares", startIcon: "dollarsign.circle.fill", text: $dolares, onClearAll: limpiarCampos) // Pasamos la función para limpiar todos los campos)
+                                TextFieldPersonal(placeholder: "Dolares", startIcon: "dollarsign.circle.fill", text: $dolares, onClearAll: limpiarCampos)
                                     .focused($isDolaresFocused)
-                                    .onChange(of: dolares) { _ in
+                                    .onChange(of: dolares) {
                                         convertirDolaresABolivares() // Llamada a la función de conversión
                                     }
                                 
@@ -105,15 +108,15 @@ struct DolarAlDiaView: View {
                             
                             HStack {
                                 // Aquí llamamos a convertirBolivaresADolares cuando el texto cambie
-                                TextFieldPersonal(placeholder: "Bolívares", startIcon: "dollarsign.circle.fill", text: $bolivares,onClearAll: limpiarCampos)
-                                   
-                                    .onChange(of: bolivares) { _ in
+                                // Aquí llamamos a convertirBolivaresADolares cuando el texto cambie
+                                TextFieldPersonal(placeholder: "Bolívares", startIcon: "dollarsign.circle.fill", text: $bolivares, onClearAll: limpiarCampos)
+                                    .onChange(of: bolivares) {
                                         convertirBolivaresADolares() // Llamada a la función de conversión
                                     }
                                 
                                 Button(action: {
                                     UIPasteboard.general.string = bolivares
-                                    print(bolivares)
+                                    
                                     showToastMessage()
                                 }) {
                                     Image(systemName: "doc.on.doc")
@@ -127,7 +130,7 @@ struct DolarAlDiaView: View {
                             //Colocar Funcion para comparar el dolar
                             calcularDiferencia()
                             showSheet = true
-                           
+                            
                         }){
                             Image(systemName: "mail.and.text.magnifyingglass")
                                 .resizable()
@@ -152,8 +155,9 @@ struct DolarAlDiaView: View {
                 
                 Button(action: {
                     Task {
+                        print("paso por el REFRESH BOTON")
                         isLoading = true
-                        await fetchDollarRates()
+                        await llamarApiDolar()
                         isLoading = false
                     }
                 }) {
@@ -166,11 +170,14 @@ struct DolarAlDiaView: View {
             }
             .padding()
             .onAppear {
+                tasaPromedio = funTasaPromedio()
                 Task {
+                
                     isLoading = true
-                    await fetchDollarRates()
+                    await llamarApiDolar()
                     isLoading = false
                 }
+                
             }.sheet(isPresented: $showSheet) {
                 ResultSheet(
                     mensaje: mensaje,
@@ -213,7 +220,7 @@ struct DolarAlDiaView: View {
         }
     }
     
-
+    
     
     func showToastMessage() {
         withAnimation {
@@ -234,18 +241,18 @@ struct DolarAlDiaView: View {
         numberFormatter.decimalSeparator = ","
         numberFormatter.minimumFractionDigits = 2
         numberFormatter.maximumFractionDigits = 2
-
+        
         if isDolaresFocused {
             var tasa: Double?
-
-            if selectedButton == "Dolar Bcv" {
+            
+            if selectedButton == Constants.DOLARBCV {
                 tasa = Double(tasaBCV)
-            } else if selectedButton == "Dolar Paralelo" {
+            } else if selectedButton == Constants.DOLARPARALELO {
                 tasa = Double(tasaParalelo)
-            } else if selectedButton == "Dolar Promedio" {
-                tasa = Double(tasaPromedio())
+            } else if selectedButton == Constants.DOLARPROMEDIO {
+                tasa = Double(funTasaPromedio())
             }
-
+            
             // Asegurarse de que las conversiones de tasa y dólares sean válidas
             if let dolares = Double(dolares), let tasa = tasa {
                 let bolivares = dolares * tasa
@@ -253,34 +260,36 @@ struct DolarAlDiaView: View {
                 // Formatear el valor de bolívares con separadores de miles y decimales
                 if let formattedBolivares = numberFormatter.string(from: NSNumber(value: bolivares)) {
                     self.bolivares = formattedBolivares
+                    
                 } else {
                     self.bolivares = String(format: "%.2f", bolivares) // En caso de error, formato estándar
                 }
             }
         }
     }
-
-
+    
+    
     func convertirBolivaresADolares() {
         // Formateador de números para agregar separadores de miles y puntos decimales
+        print("Convertir Bolivares a Dolares")
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = "."
         numberFormatter.decimalSeparator = ","
         numberFormatter.minimumFractionDigits = 2
         numberFormatter.maximumFractionDigits = 2
-
+        
         if !isDolaresFocused {
             var tasa: Double?
-
-            if selectedButton == "Dolar Bcv" {
+            
+            if selectedButton == Constants.DOLARBCV {
                 tasa = Double(tasaBCV)
-            } else if selectedButton == "Dolar Paralelo" {
+            } else if selectedButton == Constants.DOLARPARALELO {
                 tasa = Double(tasaParalelo)
-            } else if selectedButton == "Dolar Promedio" {
-                tasa = Double(tasaPromedio())
+            } else if selectedButton == Constants.DOLARPROMEDIO{
+                tasa = Double(funTasaPromedio())
             }
-
+            
             // Asegurarse de que las conversiones de tasa y dólares sean válidas
             if let bolivares = Double(bolivares), let tasa = tasa {
                 let dolares = bolivares / tasa
@@ -293,16 +302,16 @@ struct DolarAlDiaView: View {
                 }
             }
         }
-       
+        
     }
-      // Esta función se encarga de limpiar todos los campos
-       func limpiarCampos() {
-           dolares = ""
-           bolivares = ""
-                                                    
-       }
+    // Esta función se encarga de limpiar todos los campos
+    func limpiarCampos() {
+        dolares = ""
+        bolivares = ""
+        
+    }
     
-    func fetchDollarRates() async {
+    func llamarApiDolar() async {
         do {
             let apiService = ApiNetwork()
             let dollarData = try await apiService.getDollarRates()
@@ -319,27 +328,28 @@ struct DolarAlDiaView: View {
             print("Error al obtener las tasas de dólar: \(error)")
         }
     }
-   
+    
     func calcularDiferencia() {
         // Actualizamos los valores de diferencia
+        
         mensaje = "Diferencia Cambiaria"
         diferenciaBs = (Double(tasaParalelo) ?? 1.0) * (Double(dolares) ?? 1.0) - (Double(tasaBCV) ?? 1.0) * (Double(dolares) ?? 1.0)
-    
+        
         diferenciaDolares = ((Double(tasaParalelo) ?? 1.0) * (Double(dolares) ?? 1.0) - (Double(tasaBCV) ?? 1.0) * (Double(dolares) ?? 1.0)) / (Double(tasaBCV) ?? 1.0)
         let diferenciadolares = (Double(tasaParalelo) ?? 1.0) - (Double(tasaBCV) ?? 1.0)
         diferenciaPorcentual =  (diferenciadolares / (Double(tasaBCV) ?? 1.0)) * 100
-        
         // Asegurarse de que todos los valores estén actualizados
         // Mostrar el sheet solo después de actualizar los valores
-       // showSheet = true
+        // showSheet = true
     }
-
-
     
-    func tasaPromedio() -> String {
+    
+    
+    func funTasaPromedio() -> String {
         if let bcv = Double(tasaBCV), let paralelo = Double(tasaParalelo) {
-            let promedio = (bcv + paralelo) / 2
-            return String(format: "%.2f", promedio)
+            let promedios = (bcv + paralelo) / 2
+            
+            return String(format: "%.2f", promedios)
         }
         return "0.00"
     }

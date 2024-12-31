@@ -23,7 +23,7 @@ struct UserFormView: View {
 
     var body: some View {
         Form {
-            Section(header: Text("Información del Usuario")) {
+            Section(header: Text("Datos del Pago Movil")) {
                 TextField("Alias", text: $alias)
                     .padding()
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
@@ -78,22 +78,30 @@ struct UserFormView: View {
 
     // Guardar o modificar usuario
     private func saveUser() {
+        // Si estamos modificando un usuario existente
+        if let existingUser = user {
+            // Elimina el usuario original
+            userDataManager.delete(existingUser.id)
+        }
+
+        // Crear o modificar el usuario
         let newUser = UserData(alias: alias, phone: phone, idNumber: idNumber, bank: selectedBank)
 
-        // Guardar o modificar el usuario
+        // Guardar el usuario modificado o nuevo
         userDataManager.save(user: newUser)
 
-        // Guardar como usuario predeterminado si el toggle está activado
+        // Si es el usuario predeterminado, también guardarlo como predeterminado
         if isDefaultUser {
             userDataManager.saveDefaultUser(newUser)
         }
 
         // Cerrar la vista
         presentationMode.wrappedValue.dismiss()
+
         // Llamar el callback onSave cuando el usuario se ha guardado
-              onSave()
-        
+        onSave()
     }
+
 
     // Acción de cancelar
     private func cancelAction() {

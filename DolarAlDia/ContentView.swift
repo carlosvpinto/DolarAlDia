@@ -7,10 +7,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedSection: String = "Dolar Al Día"
+    @State private var dolares: String = ""
+    @State private var bolivares: String = ""
+    @State private var tasaBCV: String = "45.5"
+    @State private var tasaParalelo: String = "57.0"
+    @State private var tasaPromedio: String = "55.0"
+    @State var selectedButton: String = Constants.DOLARBCV
+    @State private var selectedSection: String = Constants.DOLARALDIA
     @State private var showingUserForm = false // Controla la presentación del formulario
     @State private var navigateToUserList = false // Controla la navegación a la lista después de guardar un usuario
     @State private var userToEdit: UserData? // Usuario seleccionado para editar
+
+    @State private var defaultUser: UserData?
+      private let userDataManager = UserDataManager()
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -19,23 +28,23 @@ struct ContentView: View {
                 Spacer() // Mueve el contenido principal hacia abajo
 
                 // Aquí mostramos la vista según la sección seleccionada en el menú
-                if selectedSection == "Dolar Al Día" {
-                    DolarAlDiaView()
+                if selectedSection == Constants.DOLARALDIA {
+                    DolarAlDiaView(dolares: $dolares, bolivares: $bolivares,tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton )
                 }
-                if selectedSection == "Precio en Paginas" {
+                if selectedSection == Constants.PRECIOPAGINAS {
                     HStack {
                         MonitorListView()
                     }
                     .padding(.vertical, 8)
                 }
-                if selectedSection == "Precio del BCV" {
+                if selectedSection == Constants.PRECIOBCV {
                     HStack {
                         MonitorBcvListView()
                     }
                     .padding(.vertical, 8)
                 }
                 // Nueva sección: Formulario de Usuarios
-                if selectedSection == "Formulario de Usuarios" {
+                if selectedSection == Constants.PAGOSMOVILES {
                     // Cuando se guarda un usuario, cambia a la lista de usuarios
                     if navigateToUserList {
                         UserListView() // Navegar a la lista de usuarios
@@ -47,11 +56,12 @@ struct ContentView: View {
                     }
                 }
                 // Nueva sección: Lista de Usuarios
-                if selectedSection == "Lista de Usuarios" {
+                if selectedSection == Constants.LISTAPMOVILES{
                     UserListView() // Aquí añadimos la vista de la lista de usuarios
                 }
             }
             .padding(.top, 50) // Añade espacio entre el menú y el contenido principal
+           
 
             MenuView(selectedSection: $selectedSection) // Coloca el menú arriba del contenido principal
             
@@ -79,7 +89,7 @@ struct ContentView: View {
         // Capturar la pantalla
         if let capturaPantalla = tomarCapturaDePantalla() {
             // Texto personalizado para compartir
-            let textoParaCompartir = textoDescriptivo()
+            let textoParaCompartir = (generarTextoParaCompartir())
 
             // Crear el UIActivityViewController con la imagen y el texto
             let itemsParaCompartir: [Any] = [capturaPantalla, textoParaCompartir]
@@ -115,10 +125,40 @@ struct ContentView: View {
         return imagen
     }
     
-    func textoDescriptivo() -> String {
-        return "Captura de pantalla"
+    func generarTextoParaCompartir() -> String {
+        // Iniciar el texto con el tipo de dólar y monto en dólares
+        if dolares != "" {
+            
+        if selectedButton == Constants.DOLARBCV {
+            if dolares != "" {
+                let textoCompartir = "-Tasa BCV:\(tasaBCV) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                return textoCompartir
+            }
+        }
+        if selectedButton == Constants.DOLARPARALELO {
+            let textoCompartir = "-Tasa PARALELO:\(tasaParalelo) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+            return textoCompartir
+        }
+        if selectedButton == Constants.DOLARPROMEDIO {
+            let textoCompartir = "-Tasa Promedio:\(tasaPromedio) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+            return textoCompartir
+        }
+        }else{
+            let textoCompartir = "-Dolar BCV: \(tasaBCV) -Dolar PARALELO: \(tasaParalelo) -Dolar Promedio: \(tasaPromedio) \(loadDefaultUser()) "
+            print(textoCompartir)
+            return textoCompartir
+        }
+        let textoCompartir = "Tasa Otro que nose"
+        return textoCompartir
     }
-
+    
+    // Función para cargar el usuario predeterminado
+    private func loadDefaultUser()-> String {
+           defaultUser = userDataManager.loadDefaultUser()
+        let datosPagomovil = "-Banco: \(String(defaultUser!.bank)) -Telefono: \(String(defaultUser!.phone)) -Cedula: \(String (defaultUser!.idNumber)) "
+        
+        return datosPagomovil
+       }
 }
 
 #Preview {

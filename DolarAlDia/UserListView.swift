@@ -11,21 +11,49 @@ import SwiftUI
 
 struct UserListView: View {
     @State private var users: [UserData] = []
-    @State private var selectedUserId: String? // Usuario predeterminado seleccionado
+    @State private var selectedUser: UserData? // Usuario seleccionado (para agregar o modificar)
+    @State private var isShowingUserForm = false // Estado para mostrar la vista de UserForm
     let userDataManager = UserDataManager()
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(users) { user in
-                    userRow(for: user) // Descomponer en una subvista
+            VStack {
+                List {
+                    ForEach(users) { user in
+                        userRow(for: user) // Subvista para cada fila de usuario
+                    }
+                    .onDelete(perform: deleteUser)
                 }
-                .onDelete(perform: deleteUser)
             }
-            .navigationTitle("Pago Movil")
+            .navigationTitle("Pago Móvil")
+            .toolbar {
+                // Botón de agregar usuario en la barra de herramientas
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        selectedUser = nil // Limpiar usuario seleccionado para creación
+                        isShowingUserForm = true // Mostrar el formulario de usuario
+                    }) {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Agregar").fontWeight(.bold)
+                        }
+                        .padding(5)
+                        .background(Color.blue) // Fondo azul para resaltar el botón
+                        .foregroundColor(.white) // Texto en blanco
+                        .cornerRadius(10) // Bordes redondeados
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingUserForm) {
+                // Mostrar UserFormView en modo de creación o edición
+                UserFormView(user: selectedUser, onSave: {
+                    users = userDataManager.load() // Actualizar la lista de usuarios
+                    isShowingUserForm = false // Cerrar la vista del formulario
+                })
+            }
             .onAppear {
                 users = userDataManager.load() // Cargar usuarios
-                selectedUserId = userDataManager.loadDefaultUser()?.id // Cargar usuario predeterminado
+                selectedUser = userDataManager.loadDefaultUser() // Cargar usuario predeterminado
             }
         }
     }
@@ -49,12 +77,13 @@ struct UserListView: View {
 
     // Subvista para el checkbox de usuario predeterminado
     private func userCheckbox(for user: UserData) -> some View {
+
         Button(action: {
-            selectedUserId = user.id
+            selectedUser = user // Actualizar usuario seleccionado
             userDataManager.saveDefaultUser(user) // Guarda el usuario predeterminado
         }) {
-            Image(systemName: selectedUserId == user.id ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(selectedUserId == user.id ? .green : .gray)
+            Image(systemName: selectedUser?.id == user.id ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(selectedUser?.id == user.id ? .green : .gray)
                 .font(.title2)
         }
     }
@@ -82,7 +111,8 @@ struct UserListView: View {
         HStack {
             // Botón para modificar el usuario
             Button(action: {
-                modifyUser(user)
+                selectedUser = user // Establecer usuario seleccionado para editar
+                isShowingUserForm = true // Mostrar el formulario de usuario
             }) {
                 Image(systemName: "pencil")
                     .foregroundColor(.blue)
@@ -100,11 +130,6 @@ struct UserListView: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
-    }
-
-    // Función para modificar el usuario
-    private func modifyUser(_ user: UserData) {
-        // Lógica para modificar el usuario
     }
 
     // Función para eliminar un usuario
@@ -129,3 +154,4 @@ struct UserListView_Previews: PreviewProvider {
         UserListView()
     }
 }
+

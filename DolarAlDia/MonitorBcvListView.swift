@@ -95,7 +95,7 @@ struct MonitorBcvListView: View {
                         .listStyle(InsetGroupedListStyle()) // Mejor estilo de lista
                     }
                 }
-                .navigationTitle("Monitores BCV")
+                .navigationTitle("Precio en Bancos")
                 .navigationBarTitleDisplayMode(.inline)
             }
             .onAppear {
