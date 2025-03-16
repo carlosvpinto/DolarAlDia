@@ -6,6 +6,12 @@
 //
 import SwiftUI
 
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
 struct ContentView: View {
     @State private var dolares: String = ""
     @State private var bolivares: String = ""
@@ -14,76 +20,86 @@ struct ContentView: View {
     @State private var tasaPromedio: String = "55.0"
     @State var selectedButton: String = Constants.DOLARBCV
     @State private var selectedSection: String = Constants.DOLARALDIA
-    @State private var showingUserForm = false // Controla la presentación del formulario
-    @State private var navigateToUserList = false // Controla la navegación a la lista después de guardar un usuario
-    @State private var userToEdit: UserData? // Usuario seleccionado para editar
-
+    @State private var showingUserForm = false
+    @State private var navigateToUserList = false
+    @State private var userToEdit: UserData?
     @State private var defaultUser: UserData?
-      private let userDataManager = UserDataManager()
+    @State private var isMenuOpen: Bool = false // Controla el estado del menú
+
+    private let userDataManager = UserDataManager()
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            
-            VStack {
-                Spacer() // Mueve el contenido principal hacia abajo
+        NavigationView {
+            ZStack(alignment: .topLeading) {
+                VStack {
+                    Spacer()
 
-                // Aquí mostramos la vista según la sección seleccionada en el menú
-                if selectedSection == Constants.DOLARALDIA {
-                    DolarAlDiaView(dolares: $dolares, bolivares: $bolivares,tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton )
-                }
-                if selectedSection == Constants.PRECIOPAGINAS {
-                    HStack {
-                        MonitorListView()
+                    // Mostrar contenido según la sección seleccionada
+                    if selectedSection == Constants.DOLARALDIA {
+                        DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
                     }
-                    .padding(.vertical, 8)
-                }
-                if selectedSection == Constants.PRECIOBCV {
-                    HStack {
-                        MonitorBcvListView()
+                    if selectedSection == Constants.PRECIOPAGINAS {
+                        HStack {
+                            MonitorListView()
+                        }
+                        .padding(.vertical, 8)
                     }
-                    .padding(.vertical, 8)
-                }
-                // Nueva sección: Formulario de Usuarios
-                if selectedSection == Constants.PAGOSMOVILES {
-                    // Cuando se guarda un usuario, cambia a la lista de usuarios
-                    if navigateToUserList {
-                        UserListView() // Navegar a la lista de usuarios
-                    } else {
-                        UserFormView(onSave: {
-                            // Cambia la bandera cuando el usuario se guarda
-                            navigateToUserList = true
-                        })
+                    if selectedSection == Constants.PRECIOBCV {
+                        HStack {
+                            MonitorBcvListView()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    if selectedSection == Constants.PAGOSMOVILES {
+                        if navigateToUserList {
+                            UserListView()
+                        } else {
+                            UserFormView(onSave: {
+                                navigateToUserList = true
+                            })
+                        }
+                    }
+                    if selectedSection == Constants.LISTAPMOVILES {
+                        UserListView()
                     }
                 }
-                // Nueva sección: Lista de Usuarios
-                if selectedSection == Constants.LISTAPMOVILES{
-                    UserListView() // Aquí añadimos la vista de la lista de usuarios
+                .padding(.top, 50)
+                .onTapGesture {
+                    UIApplication.shared.endEditing()
                 }
             }
-            .padding(.top, 50) // Añade espacio entre el menú y el contenido principal
-           
-
-            MenuView(selectedSection: $selectedSection) // Coloca el menú arriba del contenido principal
-            
-            // Botón de compartir en la parte superior derecha
-            VStack {
-                HStack {
-                    Spacer() // Empuja el botón a la derecha
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    // Botón de menú en el toolbar
+                    Button(action: {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                            isMenuOpen.toggle()
+                        }
+                    }) {
+                        Image(systemName: "line.horizontal.3")
+                            .imageScale(.large)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    // Botón de compartir en el toolbar
                     Button(action: {
                         compartirCapturaConTexto()
                     }) {
-                        Image(systemName: "square.and.arrow.up") // Ícono típico de compartir
-                            .font(.title) // Tamaño del ícono
-                           // .foregroundColor(.blue) // Color del ícono
-                            .padding()
+                        Image(systemName: "square.and.arrow.up")
+                            .imageScale(.large)
                     }
                 }
-                Spacer() // Para mantener el botón en la parte superior
             }
-            .padding(.top, 4) // Añade un pequeño padding en la parte superior
-            .padding(.trailing, 10) // Añade un pequeño padding a la derecha
+            .overlay(
+                MenuView(selectedSection: $selectedSection, isMenuOpen: $isMenuOpen)
+                    .frame(maxWidth: isMenuOpen ? 250 : 0) // Ajustar el ancho del menú
+                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isMenuOpen)
+                    .offset(x: isMenuOpen ? 0 : -250) // Mover el menú hacia la izquierda cuando está cerrado
+            )
         }
-    }
+    
+}
     
     func compartirCapturaConTexto() {
         // Capturar la pantalla
