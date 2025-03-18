@@ -190,18 +190,23 @@ struct DolarAlDiaView: View {
             }
             
             if showToast {
-                VStack {
-                    Spacer()
-                    Text("Valor copiado al portapapeles")
-                        .font(.headline)
-                        .padding()
-                        .background(Color.black.opacity(0.8))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .padding(.bottom, 50)
+                ZStack {
+                    Color.clear // Ayuda a usar ZStack como contenedor sin cambiar el fondo.
+
+                    VStack {
+                        Text("Valor copiado al portapapeles")
+                            .font(.headline)
+                            .padding()
+                            .background(Color.black.opacity(0.6))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // Asegura que ocupe toda la pantalla.
+                .background(Color.clear) // Fondo transparente para no bloquear la vista.
                 .transition(.opacity)
             }
+
             
             if isLoading {
                 ZStack {

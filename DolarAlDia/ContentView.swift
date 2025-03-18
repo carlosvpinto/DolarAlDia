@@ -30,50 +30,64 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            ZStack(alignment: .topLeading) {
-                VStack {
-                    Spacer()
-
-                    // Mostrar contenido según la sección seleccionada
-                    if selectedSection == Constants.DOLARALDIA {
-                        DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
-                    }
-                    if selectedSection == Constants.PRECIOPAGINAS {
-                        HStack {
-                            MonitorListView()
+         //   ScrollView {
+                ZStack(alignment: .topLeading) {
+                    VStack {
+                        Spacer()
+                        
+                        // Mostrar contenido según la sección seleccionada
+                        if selectedSection == Constants.DOLARALDIA {
+                            DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
                         }
-                        .padding(.vertical, 8)
-                    }
-                    if selectedSection == Constants.PRECIOBCV {
-                        HStack {
-                            MonitorBcvListView()
+                        if selectedSection == Constants.PRECIOPAGINAS {
+                            HStack {
+                                MonitorListView()
+                            }
+                            .padding(.vertical, 8)
                         }
-                        .padding(.vertical, 8)
-                    }
-                    if selectedSection == Constants.PAGOSMOVILES {
-                        if navigateToUserList {
+                        if selectedSection == Constants.PRECIOBCV {
+                            HStack {
+                                MonitorBcvListView()
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        if selectedSection == Constants.PAGOSMOVILES {
+                            if navigateToUserList {
+                                UserListView()
+                            } else {
+                                UserFormView(onSave: {
+                                    navigateToUserList = true
+                                })
+                            }
+                        }
+                        if selectedSection == Constants.LISTAPMOVILES {
                             UserListView()
-                        } else {
-                            UserFormView(onSave: {
-                                navigateToUserList = true
-                            })
                         }
                     }
-                    if selectedSection == Constants.LISTAPMOVILES {
-                        UserListView()
+                    .padding(.top, 20)
+                    .onTapGesture {
+                        UIApplication.shared.endEditing()
+                    }
+                    // NUEVO: Capa semitransparente para detectar toques fuera del menú
+                    if isMenuOpen {
+                        Color.black.opacity(0.3)
+                            .edgesIgnoringSafeArea(.all)
+                            .onTapGesture {
+                                withAnimation {
+                                    isMenuOpen = false
+                                }
+                            }
                     }
                 }
-                .padding(.top, 50)
-                .onTapGesture {
-                    UIApplication.shared.endEditing()
-                }
-            }
+                
+            //}
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     // Botón de menú en el toolbar
                     Button(action: {
                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                             isMenuOpen.toggle()
+                            UIApplication.shared.endEditing() // Cierra el teclado
                         }
                     }) {
                         Image(systemName: "line.horizontal.3")
@@ -97,9 +111,21 @@ struct ContentView: View {
                     .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isMenuOpen)
                     .offset(x: isMenuOpen ? 0 : -250) // Mover el menú hacia la izquierda cuando está cerrado
             )
-        }
+            .gesture(
+                            TapGesture()
+                                .onEnded { _ in
+                                    if isMenuOpen {
+                                        withAnimation {
+                                            isMenuOpen = false
+                                        }
+                                    }
+                                }
+                        )
+                    }
+                }
+        
     
-}
+
     
     func compartirCapturaConTexto() {
         // Capturar la pantalla

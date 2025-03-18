@@ -14,6 +14,7 @@ struct BotonInfoPrecio: View {
     var variacionPorcentaje: String
     var isSelected: Bool
     var action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(spacing: 5) {
@@ -43,7 +44,7 @@ struct BotonInfoPrecio: View {
                     
                     Text("\(variacionPorcentaje)%")
                         .font(.caption)
-                        .foregroundColor(.black)
+                        .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }
             }
         }
