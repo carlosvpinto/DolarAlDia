@@ -41,6 +41,7 @@ struct DolarAlDiaView: View {
     @State private var diferenciaDolares = 0.0
     @State private var diferenciaPorcentual = 0.0
     @State private var isMenuPresented = false
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         
@@ -217,7 +218,8 @@ struct DolarAlDiaView: View {
                         ProgressView("Actualizando...")
                             .progressViewStyle(CircularProgressViewStyle())
                             .padding()
-                            .background(Color.white)
+                            .background(colorScheme == .dark ? Color.black : Color.white)
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .cornerRadius(10)
                             .shadow(radius: 10)
                     }

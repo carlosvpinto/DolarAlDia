@@ -53,7 +53,9 @@ struct TextFieldPersonal: View {
             )
             .animation(.easeInOut(duration: 0.2), value: isFocused) // Animación del borde
         }
-        .padding()
+        .padding(.vertical)
+
+
     }
 }
 // Función que se llamará cuando el texto cambie
@@ -61,8 +63,24 @@ struct TextFieldPersonal: View {
         print("YESSS")
     }
 
-//#Preview {
-    // Como este es un preview, necesitamos pasar un binding con .constant
- //   TextFieldPersonal(placeholder: "Bolívares", startIcon: "dollarsign.circle.fill", text: .constant(""))
-//}
+#Preview {
+    struct PreviewWrapper: View {
+        @State private var text = ""
+        
+        var body: some View {
+            TextFieldPersonal(
+                placeholder: "Ingrese un valor",
+                startIcon: "dollarsign.circle",
+                text: $text,
+                onClearAll: {
+                    // Acción para limpiar todos los campos
+                    text = ""
+                }
+            )
+        }
+    }
+    
+    return PreviewWrapper()
+}
+
 
