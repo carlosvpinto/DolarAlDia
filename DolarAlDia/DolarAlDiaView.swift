@@ -102,7 +102,7 @@ struct DolarAlDiaView: View {
                                     Image(systemName: "doc.on.doc")
                                         .resizable()
                                         .frame(width: 24, height: 24)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.blue)
                                 }
                             }
                             
@@ -122,7 +122,7 @@ struct DolarAlDiaView: View {
                                     Image(systemName: "doc.on.doc")
                                         .resizable()
                                         .frame(width: 24, height: 24)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.blue)
                                 }
                             }
                         }
@@ -135,7 +135,8 @@ struct DolarAlDiaView: View {
                             Image(systemName: "mail.and.text.magnifyingglass")
                                 .resizable()
                                 .frame(width: 24, height: 24)
-                                .foregroundColor(.black)
+                                .foregroundColor(.blue)
+                               
                         }
                     }
                     .padding(10)

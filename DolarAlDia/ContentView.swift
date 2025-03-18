@@ -93,7 +93,7 @@ struct ContentView: View {
             }
             .overlay(
                 MenuView(selectedSection: $selectedSection, isMenuOpen: $isMenuOpen)
-                    .frame(maxWidth: isMenuOpen ? 250 : 0) // Ajustar el ancho del menú
+                    .frame(maxWidth: isMenuOpen ? 350 : 0) // Ajustar el ancho del menú
                     .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isMenuOpen)
                     .offset(x: isMenuOpen ? 0 : -250) // Mover el menú hacia la izquierda cuando está cerrado
             )
