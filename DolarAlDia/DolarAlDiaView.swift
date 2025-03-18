@@ -322,7 +322,7 @@ struct DolarAlDiaView: View {
     func llamarApiDolar() async {
         do {
             let apiService = ApiNetwork()
-            let dollarData = try await apiService.getDollarRates()
+            let dollarData = try await apiService.getDollarRatesBasedOnTime()
             tasaBCV = String(format: "%.2f", dollarData.monitors.bcv.price)
             tasaParalelo = String(format: "%.2f", dollarData.monitors.enparalelovzla.price)
             porcentajeBcv = dollarData.monitors.bcv.percent.description
@@ -331,6 +331,7 @@ struct DolarAlDiaView: View {
             simboloParalelo = dollarData.monitors.enparalelovzla.symbol
             fechaActualizacionBCV = dollarData.monitors.bcv.lastUpdate
             fechaActualizacionParalelo = dollarData.monitors.enparalelovzla.lastUpdate
+            tasaPromedio = funTasaPromedio()
             calcularDiferencia()
         } catch {
             print("Error al obtener las tasas de dólar: \(error)")

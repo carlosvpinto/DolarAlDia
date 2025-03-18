@@ -56,6 +56,27 @@ class ApiNetwork {
         }
     }
 
+   
+    
+    func getDollarRatesBasedOnTime() async throws -> DollarResponse {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let weekday = calendar.component(.weekday, from: now)
+        let isWeekend = weekday == 1 || weekday == 7
+        
+        let hour = calendar.component(.hour, from: now)
+        let minute = calendar.component(.minute, from: now)
+        
+        let currentTimeInMinutes = hour * 60 + minute
+        
+        if isWeekend || currentTimeInMinutes >= (15 * 60 + 1) {
+            return try await getDollarAlCambio()
+        } else {
+            return try await getDollarRates()
+        }
+    }
+
     // Función para obtener la información del dólar
     func getDollarRates() async throws -> DollarResponse {
         let url = URL(string: "https://pydolarve.org/api/v1/dollar")!
@@ -66,8 +87,21 @@ class ApiNetwork {
 
         let (data, _) = try await URLSession.shared.data(for: request)
         
-        // Decodificar los datos en `DollarResponse`
         let dollarResponse = try JSONDecoder().decode(DollarResponse.self, from: data)
         return dollarResponse
     }
+
+    func getDollarAlCambio() async throws -> DollarResponse {
+        let url = URL(string: "https://pydolarve.org/api/v1/dollar?page=alcambio&format_date=default&rounded_price=true")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer 2x9Qjpxl5F8CoKK6T395KA", forHTTPHeaderField: "Authorization")
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        
+        let dollarResponse = try JSONDecoder().decode(DollarResponse.self, from: data)
+        return dollarResponse
+    }
+
 }
