@@ -37,7 +37,7 @@ struct MenuView: View {
                         menuOption(label: "Inicio", systemImage: "house", section: Constants.DOLARALDIA)
                         menuOption(label: "Precio en Paginas", systemImage: "network", section: Constants.PRECIOPAGINAS)
                         menuOption(label: "Precio en Oficial", systemImage: "dollarsign.bank.building", section: Constants.PRECIOBCV)
-                      //  menuOption(label: "Pago Movil", systemImage: "person.text.rectangle", section: Constants.PAGOSMOVILES)
+                       // menuOption(label: "Pago Movil", systemImage: "person.text.rectangle", section: Constants.PAGOSMOVILES)
                         menuOption(label: "Pago Movil lista", systemImage: "list.bullet.rectangle", section: Constants.LISTAPMOVILES)
                     }
                     .padding(.top, geometry.safeAreaInsets.top) // Añade padding en la parte superior

@@ -89,7 +89,7 @@ struct DolarAlDiaView: View {
                         
                         VStack(alignment: .leading, spacing: -10) {
                             HStack {
-                                TextFieldPersonal(placeholder: "Dolares", startIcon: "dollarsign.circle.fill", text: $dolares, onClearAll: limpiarCampos)
+                                TextFieldPersonal(placeholder: "Dolares", startIcon: "icon-dollar", text: $dolares, onClearAll: limpiarCampos)
                                     .focused($isDolaresFocused)
                                     .onChange(of: dolares) {
                                         convertirDolaresABolivares() // Llamada a la función de conversión
@@ -109,8 +109,7 @@ struct DolarAlDiaView: View {
                             
                             HStack {
                                 // Aquí llamamos a convertirBolivaresADolares cuando el texto cambie
-                                // Aquí llamamos a convertirBolivaresADolares cuando el texto cambie
-                                TextFieldPersonal(placeholder: "Bolívares", startIcon: "dollarsign.circle.fill", text: $bolivares, onClearAll: limpiarCampos)
+                                TextFieldPersonal(placeholder: "Bolívares", startIcon: "icon-bs", text: $bolivares, onClearAll: limpiarCampos)
                                     .onChange(of: bolivares) {
                                         convertirBolivaresADolares() // Llamada a la función de conversión
                                     }
@@ -242,43 +241,44 @@ struct DolarAlDiaView: View {
     }
     
     func convertirDolaresABolivares() {
-        // Formateador de números para agregar separadores de miles y puntos decimales
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = "."
         numberFormatter.decimalSeparator = ","
         numberFormatter.minimumFractionDigits = 2
         numberFormatter.maximumFractionDigits = 2
-        
+
         if isDolaresFocused {
-            var tasa: Double?
+            let dolaresNormalizados = dolares.replacingOccurrences(of: ",", with: ".")
             
-            if selectedButton == Constants.DOLARBCV {
-                tasa = Double(tasaBCV)
-            } else if selectedButton == Constants.DOLARPARALELO {
-                tasa = Double(tasaParalelo)
-            } else if selectedButton == Constants.DOLARPROMEDIO {
-                tasa = Double(funTasaPromedio())
-            }
-            
-            // Asegurarse de que las conversiones de tasa y dólares sean válidas
-            if let dolares = Double(dolares), let tasa = tasa {
+            if let dolares = Double(dolaresNormalizados) {
+                var tasa: Double = 0
+                
+                switch selectedButton {
+                case Constants.DOLARBCV:
+                    tasa = Double(tasaBCV) ?? 0
+                case Constants.DOLARPARALELO:
+                    tasa = Double(tasaParalelo) ?? 0
+                case Constants.DOLARPROMEDIO:
+                    tasa = Double(funTasaPromedio()) ?? 0
+                default:
+                    break
+                }
+                
                 let bolivares = dolares * tasa
                 
-                // Formatear el valor de bolívares con separadores de miles y decimales
                 if let formattedBolivares = numberFormatter.string(from: NSNumber(value: bolivares)) {
                     self.bolivares = formattedBolivares
-                    
                 } else {
-                    self.bolivares = String(format: "%.2f", bolivares) // En caso de error, formato estándar
+                    self.bolivares = String(format: "%.2f", bolivares)
                 }
             }
         }
     }
+
     
     
     func convertirBolivaresADolares() {
-        // Formateador de números para agregar separadores de miles y puntos decimales
         print("Convertir Bolivares a Dolares")
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
@@ -288,30 +288,35 @@ struct DolarAlDiaView: View {
         numberFormatter.maximumFractionDigits = 2
         
         if !isDolaresFocused {
-            var tasa: Double?
+            let bolivaresNormalizados = bolivares.replacingOccurrences(of: ",", with: ".")
             
-            if selectedButton == Constants.DOLARBCV {
-                tasa = Double(tasaBCV)
-            } else if selectedButton == Constants.DOLARPARALELO {
-                tasa = Double(tasaParalelo)
-            } else if selectedButton == Constants.DOLARPROMEDIO{
-                tasa = Double(funTasaPromedio())
-            }
-            
-            // Asegurarse de que las conversiones de tasa y dólares sean válidas
-            if let bolivares = Double(bolivares), let tasa = tasa {
-                let dolares = bolivares / tasa
+            if let bolivares = Double(bolivaresNormalizados) {
+                var tasa: Double = 0
                 
-                // Formatear el valor de bolívares con separadores de miles y decimales
-                if let formattedDolares = numberFormatter.string(from: NSNumber(value: dolares)) {
-                    self.dolares = formattedDolares
-                } else {
-                    self.dolares = String(format: "%.2f", dolares) // En caso de error, formato estándar
+                switch selectedButton {
+                case Constants.DOLARBCV:
+                    tasa = Double(tasaBCV) ?? 0
+                case Constants.DOLARPARALELO:
+                    tasa = Double(tasaParalelo) ?? 0
+                case Constants.DOLARPROMEDIO:
+                    tasa = Double(funTasaPromedio()) ?? 0
+                default:
+                    break
+                }
+                
+                if tasa > 0 {
+                    let dolares = bolivares / tasa
+                    
+                    if let formattedDolares = numberFormatter.string(from: NSNumber(value: dolares)) {
+                        self.dolares = formattedDolares
+                    } else {
+                        self.dolares = String(format: "%.2f", dolares)
+                    }
                 }
             }
         }
-        
     }
+
     // Esta función se encarga de limpiar todos los campos
     func limpiarCampos() {
         dolares = ""

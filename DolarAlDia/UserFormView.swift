@@ -17,7 +17,7 @@ struct UserFormView: View {
     @Environment(\.presentationMode) var presentationMode
     var userDataManager = UserDataManager()
     var user: UserData? // Parámetro opcional para editar un usuario existente
-    var banks: [String] = ["Banco de Venezuela", "Banesco", "Mercantil", "Bancaribe"] // Puedes personalizar la lista de bancos
+   // var banks: [String] = ["Banco de Venezuela", "Banesco", "Mercantil", "Bancaribe"] // Puedes personalizar la lista de bancos
     var onSave: () -> Void // Callback para notificar que se ha guardado un usuario
 
 
@@ -39,7 +39,7 @@ struct UserFormView: View {
                     .keyboardType(.numberPad)
 
                 Picker("Banco", selection: $selectedBank) {
-                    ForEach(banks, id: \.self) { bank in
+                    ForEach(Constants.BANKS, id: \.self) { bank in
                         Text(bank).tag(bank)
                     }
                 }

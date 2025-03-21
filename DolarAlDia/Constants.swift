@@ -21,5 +21,6 @@ struct Constants {
     static let LISTAUSUARIOS = "Lista de Usuarios"
     static let PAGOSMOVILES = "PagosMoviles"
     static let LISTAPMOVILES = "Lista de PagosMoviles"
+    static let BANKS: [String] = ["Banco de Venezuela", "Banesco", "Mercantil", "Bancaribe"]
    
 }

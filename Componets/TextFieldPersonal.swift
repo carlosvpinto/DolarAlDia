@@ -20,9 +20,10 @@ struct TextFieldPersonal: View {
 
             // Campo de texto
             HStack {
-                Image(systemName: startIcon)
+                Image(startIcon).resizable()
                     .foregroundColor(.gray)
                     .padding(.leading, 5) // Pequeño padding para que no esté pegado al borde
+                    .frame(width: 24, height: 24)
 
                 TextField("", text: $text)
                     .focused($isFocused) // Vincular el estado del enfoque con FocusState
@@ -70,7 +71,7 @@ struct TextFieldPersonal: View {
         var body: some View {
             TextFieldPersonal(
                 placeholder: "Ingrese un valor",
-                startIcon: "dollarsign.circle",
+                startIcon: "icon-dollar",
                 text: $text,
                 onClearAll: {
                     // Acción para limpiar todos los campos

@@ -25,84 +25,96 @@ struct ContentView: View {
     @State private var userToEdit: UserData?
     @State private var defaultUser: UserData?
     @State private var isMenuOpen: Bool = false // Controla el estado del menú
+    @State private var showingConfirmationDialog = false // Nuevo estado para el diálogo de confirmación
 
     private let userDataManager = UserDataManager()
 
     var body: some View {
         NavigationView {
-         //   ScrollView {
-                ZStack(alignment: .topLeading) {
-                    VStack {
-                        Spacer()
-                        
-                        // Mostrar contenido según la sección seleccionada
-                        if selectedSection == Constants.DOLARALDIA {
-                            DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
+            ZStack(alignment: .topLeading) {
+                VStack {
+                    Spacer()
+
+                    // Mostrar contenido según la sección seleccionada
+                    if selectedSection == Constants.DOLARALDIA {
+                        DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
+                    }
+                    if selectedSection == Constants.PRECIOPAGINAS {
+                        HStack {
+                            MonitorListView()
                         }
-                        if selectedSection == Constants.PRECIOPAGINAS {
-                            HStack {
-                                MonitorListView()
-                            }
-                            .padding(.vertical, 8)
+                        .padding(.vertical, 8)
+                    }
+                    if selectedSection == Constants.PRECIOBCV {
+                        HStack {
+                            MonitorBcvListView()
                         }
-                        if selectedSection == Constants.PRECIOBCV {
-                            HStack {
-                                MonitorBcvListView()
-                            }
-                            .padding(.vertical, 8)
-                        }
-                        if selectedSection == Constants.PAGOSMOVILES {
-                            if navigateToUserList {
-                                UserListView()
-                            } else {
-                                UserFormView(onSave: {
-                                    navigateToUserList = true
-                                })
-                            }
-                        }
-                        if selectedSection == Constants.LISTAPMOVILES {
+                        .padding(.vertical, 8)
+                    }
+                    if selectedSection == Constants.PAGOSMOVILES {
+                        if navigateToUserList {
                             UserListView()
+                        } else {
+                            UserFormView(onSave: {
+                                navigateToUserList = true
+                            })
                         }
                     }
-                    .padding(.top, 20)
-                    .onTapGesture {
-                        UIApplication.shared.endEditing()
-                    }
-                    // NUEVO: Capa semitransparente para detectar toques fuera del menú
-                    if isMenuOpen {
-                        Color.black.opacity(0.3)
-                            .edgesIgnoringSafeArea(.all)
-                            .onTapGesture {
-                                withAnimation {
-                                    isMenuOpen = false
-                                }
-                            }
+                    if selectedSection == Constants.LISTAPMOVILES {
+                        UserListView()
                     }
                 }
-                
-            //}
+                .padding(.top, 20)
+                .onTapGesture {
+                    UIApplication.shared.endEditing()
+                }
+                // NUEVO: Capa semitransparente para detectar toques fuera del menú
+                if isMenuOpen {
+                    Color.black.opacity(0.3)
+                        .edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                            withAnimation {
+                                isMenuOpen = false
+                            }
+                        }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     // Botón de menú en el toolbar
                     Button(action: {
                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                             isMenuOpen.toggle()
-                            UIApplication.shared.endEditing() // Cierra el teclado
                         }
                     }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     // Botón de compartir en el toolbar
                     Button(action: {
-                        compartirCapturaConTexto()
+                        showingConfirmationDialog = true // Mostrar el diálogo de confirmación
                     }) {
                         Image(systemName: "square.and.arrow.up")
                             .imageScale(.large)
                     }
+                }
+            }
+            .confirmationDialog(
+                "¿Compartir datos de pago móvil?",
+                isPresented: $showingConfirmationDialog,
+                titleVisibility: .visible
+            ) {
+                Button("Compartir con datos", action: {
+                    compartirCapturaConTexto(incluirDatosUsuario: true) // Compartir con datos de usuario
+                })
+                Button("Compartir sin datos", action: {
+                    compartirCapturaConTexto(incluirDatosUsuario: false) // Compartir sin datos de usuario
+                })
+                Button("Cancelar", role: .cancel) {
+                    // No hacer nada
                 }
             }
             .overlay(
@@ -112,26 +124,27 @@ struct ContentView: View {
                     .offset(x: isMenuOpen ? 0 : -250) // Mover el menú hacia la izquierda cuando está cerrado
             )
             .gesture(
-                            TapGesture()
-                                .onEnded { _ in
-                                    if isMenuOpen {
-                                        withAnimation {
-                                            isMenuOpen = false
-                                        }
-                                    }
-                                }
-                        )
+                TapGesture()
+                    .onEnded { _ in
+                        if isMenuOpen {
+                            withAnimation {
+                                isMenuOpen = false
+                            }
+                        }
                     }
-                }
+            )
+        }
+    }
         
     
 
     
-    func compartirCapturaConTexto() {
-        // Capturar la pantalla
-        if let capturaPantalla = tomarCapturaDePantalla() {
+    func compartirCapturaConTexto(incluirDatosUsuario: Bool) {
+            // Capturar la pantalla
+            guard let capturaPantalla = tomarCapturaDePantalla() else { return }
+
             // Texto personalizado para compartir
-            let textoParaCompartir = (generarTextoParaCompartir())
+            let textoParaCompartir = generarTextoParaCompartir(incluirDatosUsuario: incluirDatosUsuario)
 
             // Crear el UIActivityViewController con la imagen y el texto
             let itemsParaCompartir: [Any] = [capturaPantalla, textoParaCompartir]
@@ -144,65 +157,68 @@ struct ContentView: View {
             if let scene = UIApplication.shared.connectedScenes
                 .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
                let rootViewController = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-                
+
                 rootViewController.present(activityViewController, animated: true, completion: nil)
             }
         }
-    }
 
-    func tomarCapturaDePantalla() -> UIImage? {
-        // Obtén la escena de ventana activa
-        guard let ventana = UIApplication.shared.connectedScenes
-                .filter({ $0.activationState == .foregroundActive })
-                .compactMap({ $0 as? UIWindowScene })
-                .first?.windows
-                .first(where: { $0.isKeyWindow }) else {
-            return nil
-        }
-
-        let renderer = UIGraphicsImageRenderer(size: ventana.bounds.size)
-        let imagen = renderer.image { ctx in
-            ventana.drawHierarchy(in: ventana.bounds, afterScreenUpdates: true)
-        }
-        return imagen
-    }
-    
-    func generarTextoParaCompartir() -> String {
-        // Iniciar el texto con el tipo de dólar y monto en dólares
-        if dolares != "" {
-            
-        if selectedButton == Constants.DOLARBCV {
-            if dolares != "" {
-                let textoCompartir = "-Tasa BCV:\(tasaBCV) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
-                return textoCompartir
+        func tomarCapturaDePantalla() -> UIImage? {
+            // Obtén la escena de ventana activa
+            guard let ventana = UIApplication.shared.connectedScenes
+                    .filter({ $0.activationState == .foregroundActive })
+                    .compactMap({ $0 as? UIWindowScene })
+                    .first?.windows
+                    .first(where: { $0.isKeyWindow }) else {
+                return nil
             }
-        }
-        if selectedButton == Constants.DOLARPARALELO {
-            let textoCompartir = "-Tasa PARALELO:\(tasaParalelo) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
-            return textoCompartir
-        }
-        if selectedButton == Constants.DOLARPROMEDIO {
-            let textoCompartir = "-Tasa Promedio:\(tasaPromedio) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
-            return textoCompartir
-        }
-        }else{
-            let textoCompartir = "-Dolar BCV: \(tasaBCV) -Dolar PARALELO: \(tasaParalelo) -Dolar Promedio: \(tasaPromedio) \(loadDefaultUser()) "
-            print(textoCompartir)
-            return textoCompartir
-        }
-        let textoCompartir = "Tasa Otro que nose"
-        return textoCompartir
-    }
-    
-    // Función para cargar el usuario predeterminado
-    private func loadDefaultUser()-> String {
-           defaultUser = userDataManager.loadDefaultUser()
-        let datosPagomovil = "-Banco: \(String(defaultUser!.bank)) -Telefono: \(String(defaultUser!.phone)) -Cedula: \(String (defaultUser!.idNumber)) "
-        
-        return datosPagomovil
-       }
-}
 
-#Preview {
-    ContentView()
-}
+            let renderer = UIGraphicsImageRenderer(size: ventana.bounds.size)
+            let imagen = renderer.image { ctx in
+                ventana.drawHierarchy(in: ventana.bounds, afterScreenUpdates: true)
+            }
+            return imagen
+        }
+
+        func generarTextoParaCompartir(incluirDatosUsuario: Bool) -> String {
+            var textoCompartir = ""
+
+            if dolares != "" {
+                if selectedButton == Constants.DOLARBCV {
+                    textoCompartir = "-Tasa BCV:\(tasaBCV) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                } else if selectedButton == Constants.DOLARPARALELO {
+                    textoCompartir = "-Tasa PARALELO:\(tasaParalelo) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                } else if selectedButton == Constants.DOLARPROMEDIO {
+                    textoCompartir = "-Tasa Promedio:\(tasaPromedio) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                }
+            } else {
+                textoCompartir = "-Dolar BCV: \(tasaBCV) -Dolar PARALELO: \(tasaParalelo) -Dolar Promedio: \(tasaPromedio)"
+            }
+
+            if incluirDatosUsuario {
+                textoCompartir += " \n \(loadDefaultUser())"
+            }
+
+            return textoCompartir
+        }
+
+    // Función para cargar el usuario predeterminado
+    private func loadDefaultUser() -> String {
+        defaultUser = userDataManager.loadDefaultUser()
+        
+        if let defaultUser = defaultUser {
+            var datosPagomovil = "*Datos del Pago Móvil:*\n" // Título en negrita
+            datosPagomovil += " Banco: \(defaultUser.bank)\n" // Añadir internado antes de "Banco"
+            datosPagomovil += " Teléfono: \(defaultUser.phone)\n" // Añadir internado antes de "Teléfono"
+            datosPagomovil += " Cédula: \(defaultUser.idNumber)\n" // Añadir internado antes de "Cédula"
+            return datosPagomovil
+        } else {
+            return "*Datos del Pago Móvil:*\n No hay usuario predeterminado" // Título en negrita
+        }
+    }
+
+
+    }
+
+    #Preview {
+        ContentView()
+    }

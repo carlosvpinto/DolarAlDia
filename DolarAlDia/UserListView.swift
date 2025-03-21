@@ -30,18 +30,26 @@ struct UserListView: View {
                 // Botón de agregar usuario en la barra de herramientas
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        selectedUser = nil // Limpiar usuario seleccionado para creación
-                        isShowingUserForm = true // Mostrar el formulario de usuario
+                        selectedUser = nil
+                        isShowingUserForm = true
                     }) {
                         HStack {
                             Image(systemName: "plus")
                             Text("Agregar").fontWeight(.bold)
                         }
-                        .padding(5)
-                        .background(Color.blue) // Fondo azul para resaltar el botón
-                        .foregroundColor(.white) // Texto en blanco
-                        .cornerRadius(10) // Bordes redondeados
+                        .padding(10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .onTapGesture {
+                            selectedUser = nil
+                            isShowingUserForm = true
+                        }
                     }
+                    .frame(width: 180, height: 44) // Aumenta el área de toque
+                    .contentShape(Rectangle()) // Asegura que toda el área sea táctil
+                    .buttonStyle(PlainButtonStyle())
+
                 }
             }
             .sheet(isPresented: $isShowingUserForm) {
@@ -115,6 +123,9 @@ struct UserListView: View {
                 isShowingUserForm = true // Mostrar el formulario de usuario
             }) {
                 Image(systemName: "pencil")
+                    .frame(width: 44, height: 44) // Aumenta el área de toque
+                    .contentShape(Rectangle()) // Asegura que toda el área sea táctil
+                    .buttonStyle(PlainButtonStyle())
                     .foregroundColor(.blue)
                     .font(.title2)
             }
