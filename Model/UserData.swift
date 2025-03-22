@@ -13,6 +13,7 @@ struct UserData: Identifiable, Codable {
     var alias: String
     var phone: String
     var idNumber: String
+    var idType: String  // Agrega esta línea
     var bank: String
 }
 

@@ -83,10 +83,11 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     // Botón de menú en el toolbar
                     Button(action: {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                            isMenuOpen.toggle()
-                        }
-                    }) {
+                                UIApplication.shared.endEditing() // Cierra el teclado si está abierto
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                                    isMenuOpen.toggle()
+                                }
+                            }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
                     }
@@ -107,10 +108,10 @@ struct ContentView: View {
                 isPresented: $showingConfirmationDialog,
                 titleVisibility: .visible
             ) {
-                Button("Compartir con datos", action: {
+                Button("SI", action: {
                     compartirCapturaConTexto(incluirDatosUsuario: true) // Compartir con datos de usuario
                 })
-                Button("Compartir sin datos", action: {
+                Button("NO", action: {
                     compartirCapturaConTexto(incluirDatosUsuario: false) // Compartir sin datos de usuario
                 })
                 Button("Cancelar", role: .cancel) {
@@ -184,14 +185,14 @@ struct ContentView: View {
 
             if dolares != "" {
                 if selectedButton == Constants.DOLARBCV {
-                    textoCompartir = "-Tasa BCV:\(tasaBCV) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                    textoCompartir = "-Tasa BCV:\(tasaBCV) \n -Monto en Dolares:\(dolares)\n -Monto en Bolivares: \(bolivares)"
                 } else if selectedButton == Constants.DOLARPARALELO {
-                    textoCompartir = "-Tasa PARALELO:\(tasaParalelo) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                    textoCompartir = "-Tasa PARALELO:\(tasaParalelo)\n -Monto en Dolares:\(dolares) \n-Monto en Bolivares: \(bolivares)"
                 } else if selectedButton == Constants.DOLARPROMEDIO {
-                    textoCompartir = "-Tasa Promedio:\(tasaPromedio) -Monto en Dolares:\(dolares) -Monto en Bolivares: \(bolivares)"
+                    textoCompartir = "-Tasa Promedio:\(tasaPromedio)\n -Monto en Dolares:\(dolares)\n -Monto en Bolivares: \(bolivares)\n\n"
                 }
             } else {
-                textoCompartir = "-Dolar BCV: \(tasaBCV) -Dolar PARALELO: \(tasaParalelo) -Dolar Promedio: \(tasaPromedio)"
+                textoCompartir = "-Dolar BCV: \(tasaBCV) \n-Dolar PARALELO: \(tasaParalelo)\n -Dolar Promedio: \(tasaPromedio) \n\n"
             }
 
             if incluirDatosUsuario {
@@ -202,19 +203,20 @@ struct ContentView: View {
         }
 
     // Función para cargar el usuario predeterminado
-    private func loadDefaultUser() -> String {
-        defaultUser = userDataManager.loadDefaultUser()
-        
-        if let defaultUser = defaultUser {
-            var datosPagomovil = "*Datos del Pago Móvil:*\n" // Título en negrita
-            datosPagomovil += " Banco: \(defaultUser.bank)\n" // Añadir internado antes de "Banco"
-            datosPagomovil += " Teléfono: \(defaultUser.phone)\n" // Añadir internado antes de "Teléfono"
-            datosPagomovil += " Cédula: \(defaultUser.idNumber)\n" // Añadir internado antes de "Cédula"
-            return datosPagomovil
-        } else {
-            return "*Datos del Pago Móvil:*\n No hay usuario predeterminado" // Título en negrita
-        }
-    }
+    // Función para cargar el usuario predeterminado
+      private func loadDefaultUser() -> String {
+          defaultUser = userDataManager.loadDefaultUser()
+
+          if let defaultUser = defaultUser {
+              var datosPagomovil = "*Datos del Pago Móvil:*\n"
+              datosPagomovil += " Banco: \(defaultUser.bank)\n"
+              datosPagomovil += " Teléfono: \(defaultUser.phone)\n"
+              datosPagomovil += " \(defaultUser.idType)-\(defaultUser.idNumber)\n" // Usa idType aquí
+              return datosPagomovil
+          } else {
+              return "*Datos del Pago Móvil:*\n No hay usuario predeterminado"
+          }
+      }
 
 
     }

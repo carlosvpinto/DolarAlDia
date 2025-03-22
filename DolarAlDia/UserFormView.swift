@@ -12,14 +12,13 @@ struct UserFormView: View {
     @State private var alias: String = ""
     @State private var phone: String = ""
     @State private var idNumber: String = ""
-    @State private var selectedBank: String = "Banesco"
-    @State private var isDefaultUser: Bool = false
+    @State private var selectedBank: String = "Banco"
+    @State private var isDefaultUser: Bool = false // Eliminar esta línea
     @Environment(\.presentationMode) var presentationMode
     var userDataManager = UserDataManager()
-    var user: UserData? // Parámetro opcional para editar un usuario existente
-   // var banks: [String] = ["Banco de Venezuela", "Banesco", "Mercantil", "Bancaribe"] // Puedes personalizar la lista de bancos
-    var onSave: () -> Void // Callback para notificar que se ha guardado un usuario
-
+    var user: UserData?
+    var onSave: () -> Void
+    @State private var selectedIdType: String = "V"
 
     var body: some View {
         Form {
@@ -33,10 +32,19 @@ struct UserFormView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
                     .keyboardType(.numberPad)
 
-                TextField("Cédula/RIF", text: $idNumber)
-                    .padding()
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                    .keyboardType(.numberPad)
+                HStack {
+                    Picker("Ci/Rif", selection: $selectedIdType) {
+                        Text("V").tag("V")
+                        Text("E").tag("E")
+                        Text("J").tag("J")
+                    }
+                    .frame(width: 100)
+
+                    TextField("Cédula/RIF", text: $idNumber)
+                        .padding()
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                        .keyboardType(.numberPad)
+                }
 
                 Picker("Banco", selection: $selectedBank) {
                     ForEach(Constants.BANKS, id: \.self) { bank in
@@ -44,7 +52,7 @@ struct UserFormView: View {
                     }
                 }
 
-                Toggle("Usuario Predeterminado", isOn: $isDefaultUser)
+                // Toggle("Usuario Predeterminado", isOn: $isDefaultUser) // Eliminar esta línea
             }
 
             Section {
@@ -71,7 +79,8 @@ struct UserFormView: View {
                 phone = user.phone
                 idNumber = user.idNumber
                 selectedBank = user.bank
-                isDefaultUser = (userDataManager.loadDefaultUser()?.id == user.id)
+                //isDefaultUser = (userDataManager.loadDefaultUser()?.id == user.id) // Eliminar esta línea
+                selectedIdType = user.idType
             }
         }
     }
@@ -80,20 +89,17 @@ struct UserFormView: View {
     private func saveUser() {
         // Si estamos modificando un usuario existente
         if let existingUser = user {
-            // Elimina el usuario original
             userDataManager.delete(existingUser.id)
         }
 
         // Crear o modificar el usuario
-        let newUser = UserData(alias: alias, phone: phone, idNumber: idNumber, bank: selectedBank)
+        let newUser = UserData(alias: alias, phone: phone, idNumber: idNumber, idType: selectedIdType, bank: selectedBank)
 
         // Guardar el usuario modificado o nuevo
         userDataManager.save(user: newUser)
 
-        // Si es el usuario predeterminado, también guardarlo como predeterminado
-        if isDefaultUser {
-            userDataManager.saveDefaultUser(newUser)
-        }
+        // Siempre guardar el nuevo usuario como predeterminado
+        userDataManager.saveDefaultUser(newUser)
 
         // Cerrar la vista
         presentationMode.wrappedValue.dismiss()
@@ -102,9 +108,12 @@ struct UserFormView: View {
         onSave()
     }
 
-
     // Acción de cancelar
     private func cancelAction() {
         presentationMode.wrappedValue.dismiss()
     }
+}
+
+#Preview {
+    UserFormView(onSave: {})
 }
