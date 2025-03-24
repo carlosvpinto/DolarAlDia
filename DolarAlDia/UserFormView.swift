@@ -12,8 +12,9 @@ struct UserFormView: View {
     @State private var alias: String = ""
     @State private var phone: String = ""
     @State private var idNumber: String = ""
-    @State private var selectedBank: String = "Banco"
+    @State private var selectedBank: String = Constants.BANKS.first ?? "" // Valor inicial seguro
     @State private var isDefaultUser: Bool = false // Eliminar esta línea
+  
     @Environment(\.presentationMode) var presentationMode
     var userDataManager = UserDataManager()
     var user: UserData?
