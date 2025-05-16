@@ -152,7 +152,9 @@ struct DolarAlDiaView: View {
                 
                 VStack {
                     Text("Act. Paralelo: \(fechaActualizacionParalelo)")
-                    Text("Act. BCV: \(fechaActualizacionBCV)")
+                   // Text("Act. BCV: \(fechaActualizacionBCV)")
+                    Text("Act. BCV: \(fechaActualizacionBCV.components(separatedBy: ",").first ?? fechaActualizacionBCV)")
+
                 }
                 
                 Button(action: {
