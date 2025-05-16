@@ -15,7 +15,7 @@ struct MenuView: View {
     var body: some View {
         if isMenuOpen {
             GeometryReader { geometry in
-                VStack(alignment: .leading, spacing: 0) { // Cambiado a spacing: 0
+                VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Image("logoredondo")
@@ -25,7 +25,6 @@ struct MenuView: View {
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity, maxHeight: 80)
-
                         .background(
                             LinearGradient(gradient: Gradient(colors: [Color.blue, Color.cyan]), startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
@@ -37,12 +36,43 @@ struct MenuView: View {
                         menuOption(label: "Inicio", systemImage: "house", section: Constants.DOLARALDIA)
                         menuOption(label: "Precio en Paginas", systemImage: "network", section: Constants.PRECIOPAGINAS)
                         menuOption(label: "Precio en Oficial", systemImage: "dollarsign.bank.building", section: Constants.PRECIOBCV)
-                       // menuOption(label: "Pago Movil", systemImage: "person.text.rectangle", section: Constants.PAGOSMOVILES)
+
+                        // Submenú Historia
+                        Menu {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.4)) {
+                                    selectedSection = Constants.HISTORIA_BCV
+                                    isMenuOpen.toggle()
+                                }
+                            } label: {
+                                Label("Dólar BCV", systemImage: "clock")
+                            }
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.4)) {
+                                    selectedSection = Constants.HISTORIA_PARALELO
+                                    isMenuOpen.toggle()
+                                }
+                            } label: {
+                                Label("Dólar Paralelo", systemImage: "clock.arrow.circlepath")
+                            }
+                        } label: {
+                            Label("Historia", systemImage: "clock")
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(
+                                    (selectedSection == "HISTORIA_BCV" || selectedSection == "HISTORIA_PARALELO") ?
+                                    (colorScheme == .dark ? Color.gray.opacity(0.3) : Color.blue.opacity(0.2)) : Color.clear
+                                )
+                                .cornerRadius(10)
+                        }
+                        .padding(.vertical, 5)
+                        .padding(.horizontal)
+
                         menuOption(label: "Pago Movil lista", systemImage: "list.bullet.rectangle", section: Constants.LISTAPMOVILES)
                     }
-                    .padding(.top, geometry.safeAreaInsets.top) // Añade padding en la parte superior
+                    .padding(.top, geometry.safeAreaInsets.top)
 
-                    Spacer() // Añade un Spacer para empujar todo hacia arriba
+                    Spacer()
                 }
                 .frame(width: min(geometry.size.width * 0.8, 300), height: geometry.size.height)
                 .background(colorScheme == .dark ? Color.black : Color.white)

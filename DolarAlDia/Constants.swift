@@ -9,6 +9,10 @@ import Foundation
 // Constants.swift
 
 struct Constants {
+    static let HISTORIA_BCV = "HISTORIA_BCV"
+    static let HISTORIA_PARALELO = "HISTORIA_PARALELO"
+
+    
     static let DOLARBCV = "Dolar BCV"
     static let DOLARPARALELO = "Dolar Paralelo"
     static let DOLARPROMEDIO = "Dolar Promedio"
@@ -20,6 +24,7 @@ struct Constants {
     static let FRMUSUARIOS = "Formulario de Usuarios"
     static let LISTAUSUARIOS = "Lista de Usuarios"
     static let PAGOSMOVILES = "PagosMoviles"
+    static let HISTORYBCV = "Historical BCV"
     static let LISTAPMOVILES = "Lista de PagosMoviles"
     static let BANKS: [String] = [
         "Seleccione el Banco",

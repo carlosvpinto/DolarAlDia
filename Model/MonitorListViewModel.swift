@@ -27,7 +27,7 @@ class MonitorListViewModel: ObservableObject {
                 // Llama al método getDollarRatesCripto
                 let response = try await apiNetworkCripto.getDollarRatesCripto()
                 
-                // Actualiza la lista de monitores directamente en el hilo principal (gracias a @MainActor)
+                // Actualiza la lista de monitores directamente en el hilo principal 
                 self.monitors = [
                     response.monitors.amazonGiftCard,
                     response.monitors.bcv,

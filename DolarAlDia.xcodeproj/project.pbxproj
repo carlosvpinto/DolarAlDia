@@ -10,6 +10,7 @@
 		DB251C072D0573270000D82F /* ResultSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C062D0573270000D82F /* ResultSheet.swift */; };
 		DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C0C2D064BAD0000D82F /* MenuView.swift */; };
 		DB251C112D06CFDE0000D82F /* MonitorListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */; };
+		DB2D42CD2DB58C4D000AF79B /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DB2D42CC2DB58C4D000AF79B /* FirebaseMessaging */; };
 		DB3C89082D0FA84600CB40CE /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89072D0FA84600CB40CE /* FirebaseAnalytics */; };
 		DB3C890A2D0FA84600CB40CE /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89092D0FA84600CB40CE /* FirebaseAnalyticsOnDeviceConversion */; };
 		DB3C890C2D0FA84600CB40CE /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C890B2D0FA84600CB40CE /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -19,6 +20,7 @@
 		DB3C89142D0FA84600CB40CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89132D0FA84600CB40CE /* FirebaseCrashlytics */; };
 		DB3C89162D0FA84600CB40CE /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89152D0FA84600CB40CE /* FirebaseDatabase */; };
 		DB3C89182D0FA84600CB40CE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89172D0FA84600CB40CE /* FirebaseFirestore */; };
+		DB7C632B2DCFCB0A001CC983 /* BCVHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */; };
 		DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */; };
 		DBA82F812CFE44CE004A0C4F /* TextFieldPersonal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */; };
 		DBA82F842CFEB876004A0C4F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F832CFEB876004A0C4F /* Model.swift */; };
@@ -33,6 +35,7 @@
 		DB251C062D0573270000D82F /* ResultSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSheet.swift; sourceTree = "<group>"; };
 		DB251C0C2D064BAD0000D82F /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorListViewModel.swift; sourceTree = "<group>"; };
+		DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCVHistoryModels.swift; sourceTree = "<group>"; };
 		DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotonInfoPrecio.swift; sourceTree = "<group>"; };
 		DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPersonal.swift; sourceTree = "<group>"; };
 		DBA82F832CFEB876004A0C4F /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
@@ -59,6 +62,7 @@
 			files = (
 				DB3C890E2D0FA84600CB40CE /* FirebaseAppCheck in Frameworks */,
 				DB3C89082D0FA84600CB40CE /* FirebaseAnalytics in Frameworks */,
+				DB2D42CD2DB58C4D000AF79B /* FirebaseMessaging in Frameworks */,
 				DB3C89102D0FA84600CB40CE /* FirebaseAppDistribution-Beta in Frameworks */,
 				DB3C89142D0FA84600CB40CE /* FirebaseCrashlytics in Frameworks */,
 				DB3C890C2D0FA84600CB40CE /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
@@ -72,6 +76,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DB2D42CB2DB58C4D000AF79B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DBA82F722CFD7296004A0C4F /* Componets */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +99,7 @@
 		DBA82F822CFEB862004A0C4F /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */,
 				DBA82F832CFEB876004A0C4F /* Model.swift */,
 				DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */,
 				DBC080952D07FC1300BF2923 /* MonitorBcvListViewModel.swift */,
@@ -103,6 +115,7 @@
 				DBA82F822CFEB862004A0C4F /* Model */,
 				DBA82F722CFD7296004A0C4F /* Componets */,
 				DBF6672F2CFC369100394884 /* DolarAlDia */,
+				DB2D42CB2DB58C4D000AF79B /* Frameworks */,
 				DBF6672E2CFC369100394884 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -144,6 +157,7 @@
 				DB3C89132D0FA84600CB40CE /* FirebaseCrashlytics */,
 				DB3C89152D0FA84600CB40CE /* FirebaseDatabase */,
 				DB3C89172D0FA84600CB40CE /* FirebaseFirestore */,
+				DB2D42CC2DB58C4D000AF79B /* FirebaseMessaging */,
 			);
 			productName = DolarAlDia;
 			productReference = DBF6672D2CFC369100394884 /* DolarAlDia.app */;
@@ -204,6 +218,7 @@
 				DBC0809A2D091C7800BF2923 /* LabeledTextFieldWithIcon.swift in Sources */,
 				DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */,
 				DB251C072D0573270000D82F /* ResultSheet.swift in Sources */,
+				DB7C632B2DCFCB0A001CC983 /* BCVHistoryModels.swift in Sources */,
 				DBBEF0E22D11F46F00ED3FA1 /* MenuSliderView.swift in Sources */,
 				DB251C112D06CFDE0000D82F /* MonitorListViewModel.swift in Sources */,
 				DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */,
@@ -342,6 +357,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -374,6 +390,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
@@ -435,6 +452,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DB2D42CC2DB58C4D000AF79B /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB3C89042D0FA4A300CB40CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		DB3C89072D0FA84600CB40CE /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DB3C89042D0FA4A300CB40CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

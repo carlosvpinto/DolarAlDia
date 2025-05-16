@@ -43,23 +43,38 @@ struct ContentView: View {
                         HStack {
                             MonitorListView()
                         }
-                        .padding(.vertical, 8)
+                      //  .padding(.vertical, 8)
                     }
                     if selectedSection == Constants.PRECIOBCV {
                         HStack {
                             MonitorBcvListView()
                         }
-                        .padding(.vertical, 8)
+                     
                     }
-                    if selectedSection == Constants.PAGOSMOVILES {
-                        if navigateToUserList {
-                            UserListView()
-                        } else {
-                            UserFormView(onSave: {
-                                navigateToUserList = true
-                            })
+                    if selectedSection == Constants.HISTORIA_BCV{
+                        HStack {
+                            BCVHistoryView(
+                                imgUrl: "https://res.cloudinary.com/dcpyfqx87/image/upload/v1729921478/monitors/public_id:bcv.webp",
+                                navigationTitle: "Historia Dólar BCV",
+                                page: "bcv",
+                                monitor: "usd"
+                            )
                         }
+                        
                     }
+                    if selectedSection == Constants.HISTORIA_PARALELO{
+                        HStack {
+                            // Dólar Paralelo
+                            BCVHistoryView(
+                                imgUrl: "https://res.cloudinary.com/dcpyfqx87/image/upload/v1729921479/monitors/public_id:epv.webp",
+                                navigationTitle: "Historia Dólar Paralelo",
+                                page: "criptodolar",
+                                monitor: "enparalelovzla"
+                            )
+                        }
+                        
+                    }
+          
                     if selectedSection == Constants.LISTAPMOVILES {
                         UserListView()
                     }

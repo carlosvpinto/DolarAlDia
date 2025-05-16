@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-
+import FirebaseCore
+import FirebaseFirestore
 struct DolarAlDiaView: View {
     @Binding var dolares: String
     @Binding var bolivares: String
@@ -159,6 +160,7 @@ struct DolarAlDiaView: View {
                         print("paso por el REFRESH BOTON")
                         isLoading = true
                         await llamarApiDolar()
+                    
                         isLoading = false
                     }
                 }) {
@@ -325,6 +327,7 @@ struct DolarAlDiaView: View {
     }
     
     func llamarApiDolar() async {
+        print("llamo al api para actualizar los datos")
         do {
             let apiService = ApiNetwork()
             let dollarData = try await apiService.getDollarRatesBasedOnTime()
@@ -368,6 +371,8 @@ struct DolarAlDiaView: View {
         return "0.00"
     }
 }
+
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
