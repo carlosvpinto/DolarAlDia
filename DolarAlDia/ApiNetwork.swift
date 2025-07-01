@@ -79,7 +79,7 @@ class ApiNetwork {
 
     // Función para obtener la información del dólar
     func getDollarRates() async throws -> DollarResponse {
-        let url = URL(string: "https://pydolarve.org/api/v1/dollar")!
+        let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

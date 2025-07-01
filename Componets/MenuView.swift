@@ -34,7 +34,7 @@ struct MenuView: View {
                             .padding(.horizontal)
 
                         menuOption(label: "Inicio", systemImage: "house", section: Constants.DOLARALDIA)
-                        menuOption(label: "Precio en Paginas", systemImage: "network", section: Constants.PRECIOPAGINAS)
+                      // menuOption(label: "Precio en Paginas", systemImage: "network", section: Constants.PRECIOPAGINAS) para que no aparezca
                         menuOption(label: "Precio en Oficial", systemImage: "dollarsign.bank.building", section: Constants.PRECIOBCV)
 
                         // Submenú Historia
@@ -47,14 +47,7 @@ struct MenuView: View {
                             } label: {
                                 Label("Dólar BCV", systemImage: "clock")
                             }
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.4)) {
-                                    selectedSection = Constants.HISTORIA_PARALELO
-                                    isMenuOpen.toggle()
-                                }
-                            } label: {
-                                Label("Dólar Paralelo", systemImage: "clock.arrow.circlepath")
-                            }
+                              
                         } label: {
                             Label("Historia", systemImage: "clock")
                                 .padding()

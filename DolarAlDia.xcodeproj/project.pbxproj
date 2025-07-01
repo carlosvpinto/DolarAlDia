@@ -47,9 +47,22 @@
 		DBF6672D2CFC369100394884 /* DolarAlDia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DolarAlDia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DB45430B2DD6E72800B07E9C /* Exceptions for "DolarAlDia" folder in "DolarAlDia" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DBF6672C2CFC369100394884 /* DolarAlDia */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DBF6672F2CFC369100394884 /* DolarAlDia */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DB45430B2DD6E72800B07E9C /* Exceptions for "DolarAlDia" folder in "DolarAlDia" target */,
+			);
 			path = DolarAlDia;
 			sourceTree = "<group>";
 		};
@@ -365,6 +378,7 @@
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DolarAlDia/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dolar Al Dia";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -397,6 +411,7 @@
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DolarAlDia/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dolar Al Dia";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

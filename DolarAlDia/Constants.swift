@@ -15,6 +15,7 @@ struct Constants {
     
     static let DOLARBCV = "Dolar BCV"
     static let DOLARPARALELO = "Dolar Paralelo"
+    static let DOLAREUROBCV = "Euro BCV"
     static let DOLARPROMEDIO = "Dolar Promedio"
     static let defaultTimeout: TimeInterval = 30.0
     static let maxRetryCount = 3

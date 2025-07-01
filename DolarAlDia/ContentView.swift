@@ -16,8 +16,7 @@ struct ContentView: View {
     @State private var dolares: String = ""
     @State private var bolivares: String = ""
     @State private var tasaBCV: String = "45.5"
-    @State private var tasaParalelo: String = "57.0"
-    @State private var tasaPromedio: String = "55.0"
+    @State private var tasaEuroBcv: String = "57.0"
     @State var selectedButton: String = Constants.DOLARBCV
     @State private var selectedSection: String = Constants.DOLARALDIA
     @State private var showingUserForm = false
@@ -37,19 +36,23 @@ struct ContentView: View {
 
                     // Mostrar contenido según la sección seleccionada
                     if selectedSection == Constants.DOLARALDIA {
-                        DolarAlDiaView(dolares: $dolares, bolivares: $bolivares, tasaBCV: $tasaBCV, tasaParalelo: $tasaParalelo, tasaPromedio: $tasaPromedio, selectedButton: $selectedButton)
+                        DolarAlDiaView(
+                            dolares: $dolares,
+                            bolivares: $bolivares,
+                            tasaBCV: $tasaBCV,
+                            tasaEuro: $tasaEuroBcv,
+                            selectedButton: $selectedButton
+                        )
                     }
                     if selectedSection == Constants.PRECIOPAGINAS {
                         HStack {
                             MonitorListView()
                         }
-                      //  .padding(.vertical, 8)
                     }
                     if selectedSection == Constants.PRECIOBCV {
                         HStack {
                             MonitorBcvListView()
                         }
-                     
                     }
                     if selectedSection == Constants.HISTORIA_BCV{
                         HStack {
@@ -60,7 +63,6 @@ struct ContentView: View {
                                 monitor: "usd"
                             )
                         }
-                        
                     }
                     if selectedSection == Constants.HISTORIA_PARALELO{
                         HStack {
@@ -72,9 +74,7 @@ struct ContentView: View {
                                 monitor: "enparalelovzla"
                             )
                         }
-                        
                     }
-          
                     if selectedSection == Constants.LISTAPMOVILES {
                         UserListView()
                     }
@@ -98,11 +98,11 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     // Botón de menú en el toolbar
                     Button(action: {
-                                UIApplication.shared.endEditing() // Cierra el teclado si está abierto
-                                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                                    isMenuOpen.toggle()
-                                }
-                            }) {
+                        UIApplication.shared.endEditing() // Cierra el teclado si está abierto
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                            isMenuOpen.toggle()
+                        }
+                    }) {
                         Image(systemName: "line.horizontal.3")
                             .imageScale(.large)
                     }
@@ -151,91 +151,75 @@ struct ContentView: View {
             )
         }
     }
-        
-    
 
-    
     func compartirCapturaConTexto(incluirDatosUsuario: Bool) {
-            // Capturar la pantalla
-            guard let capturaPantalla = tomarCapturaDePantalla() else { return }
+        // Capturar la pantalla
+        guard let capturaPantalla = tomarCapturaDePantalla() else { return }
 
-            // Texto personalizado para compartir
-            let textoParaCompartir = generarTextoParaCompartir(incluirDatosUsuario: incluirDatosUsuario)
+        // Texto personalizado para compartir
+        let textoParaCompartir = generarTextoParaCompartir(incluirDatosUsuario: incluirDatosUsuario)
 
-            // Crear el UIActivityViewController con la imagen y el texto
-            let itemsParaCompartir: [Any] = [capturaPantalla, textoParaCompartir]
-            let activityViewController = UIActivityViewController(activityItems: itemsParaCompartir, applicationActivities: nil)
+        // Crear el UIActivityViewController con la imagen y el texto
+        let itemsParaCompartir: [Any] = [capturaPantalla, textoParaCompartir]
+        let activityViewController = UIActivityViewController(activityItems: itemsParaCompartir, applicationActivities: nil)
 
-            // Excluir algunos tipos de actividad (opcional)
-            // activityViewController.excludedActivityTypes = [.airDrop, .mail]
+        // Obtener la escena activa y presentar el ActivityViewController
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+           let rootViewController = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController {
 
-            // Obtener la escena activa y presentar el ActivityViewController
-            if let scene = UIApplication.shared.connectedScenes
-                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
-               let rootViewController = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-
-                rootViewController.present(activityViewController, animated: true, completion: nil)
-            }
+            rootViewController.present(activityViewController, animated: true, completion: nil)
         }
-
-        func tomarCapturaDePantalla() -> UIImage? {
-            // Obtén la escena de ventana activa
-            guard let ventana = UIApplication.shared.connectedScenes
-                    .filter({ $0.activationState == .foregroundActive })
-                    .compactMap({ $0 as? UIWindowScene })
-                    .first?.windows
-                    .first(where: { $0.isKeyWindow }) else {
-                return nil
-            }
-
-            let renderer = UIGraphicsImageRenderer(size: ventana.bounds.size)
-            let imagen = renderer.image { ctx in
-                ventana.drawHierarchy(in: ventana.bounds, afterScreenUpdates: true)
-            }
-            return imagen
-        }
-
-        func generarTextoParaCompartir(incluirDatosUsuario: Bool) -> String {
-            var textoCompartir = ""
-
-            if dolares != "" {
-                if selectedButton == Constants.DOLARBCV {
-                    textoCompartir = "-Tasa BCV:\(tasaBCV) \n -Monto en Dolares:\(dolares)\n -Monto en Bolivares: \(bolivares)"
-                } else if selectedButton == Constants.DOLARPARALELO {
-                    textoCompartir = "-Tasa PARALELO:\(tasaParalelo)\n -Monto en Dolares:\(dolares) \n-Monto en Bolivares: \(bolivares)"
-                } else if selectedButton == Constants.DOLARPROMEDIO {
-                    textoCompartir = "-Tasa Promedio:\(tasaPromedio)\n -Monto en Dolares:\(dolares)\n -Monto en Bolivares: \(bolivares)\n\n"
-                }
-            } else {
-                textoCompartir = "-Dolar BCV: \(tasaBCV) \n-Dolar PARALELO: \(tasaParalelo)\n -Dolar Promedio: \(tasaPromedio) \n\n"
-            }
-
-            if incluirDatosUsuario {
-                textoCompartir += " \n \(loadDefaultUser())"
-            }
-
-            return textoCompartir
-        }
-
-    // Función para cargar el usuario predeterminado
-    // Función para cargar el usuario predeterminado
-      private func loadDefaultUser() -> String {
-          defaultUser = userDataManager.loadDefaultUser()
-
-          if let defaultUser = defaultUser {
-              var datosPagomovil = "*Datos del Pago Móvil:*\n"
-              datosPagomovil += " Banco: \(defaultUser.bank)\n"
-              datosPagomovil += " Teléfono: \(defaultUser.phone)\n"
-              datosPagomovil += " \(defaultUser.idType)-\(defaultUser.idNumber)\n" // Usa idType aquí
-              return datosPagomovil
-          } else {
-              return "*Datos del Pago Móvil:*\n No hay usuario predeterminado"
-          }
-      }
-
-
     }
 
-    #Preview {
-        ContentView()
+    func tomarCapturaDePantalla() -> UIImage? {
+        guard let ventana = UIApplication.shared.connectedScenes
+                .filter({ $0.activationState == .foregroundActive })
+                .compactMap({ $0 as? UIWindowScene })
+                .first?.windows
+                .first(where: { $0.isKeyWindow }) else {
+            return nil
+        }
+
+        let renderer = UIGraphicsImageRenderer(size: ventana.bounds.size)
+        let imagen = renderer.image { ctx in
+            ventana.drawHierarchy(in: ventana.bounds, afterScreenUpdates: true)
+        }
+        return imagen
     }
+
+    func generarTextoParaCompartir(incluirDatosUsuario: Bool) -> String {
+        var textoCompartir = ""
+
+        if dolares != "" {
+            if selectedButton == Constants.DOLARBCV {
+                textoCompartir = "-Tasa BCV: \(tasaBCV) \n-Monto en Dólares: \(dolares)\n-Monto en Bolívares: \(bolivares)"
+            } else if selectedButton == Constants.DOLAREUROBCV {
+                textoCompartir = "-Tasa EURO BCV: \(tasaEuroBcv)\n-Monto en Euro: \(dolares)\n-Monto en Bolívares: \(bolivares)"
+            }
+        } else {
+            textoCompartir = "-Dólar BCV: \(tasaBCV) \n-Euro BCV: \(tasaEuroBcv)\n"
+        }
+
+        if incluirDatosUsuario {
+            textoCompartir += " \n \(loadDefaultUser())"
+        }
+
+        return textoCompartir
+    }
+
+    // Función para cargar el usuario predeterminado
+    private func loadDefaultUser() -> String {
+        defaultUser = userDataManager.loadDefaultUser()
+
+        if let defaultUser = defaultUser {
+            var datosPagomovil = "*Datos del Pago Móvil:*\n"
+            datosPagomovil += " Banco: \(defaultUser.bank)\n"
+            datosPagomovil += " Teléfono: \(defaultUser.phone)\n"
+            datosPagomovil += " \(defaultUser.idType)-\(defaultUser.idNumber)\n"
+            return datosPagomovil
+        } else {
+            return "*Datos del Pago Móvil:*\n No hay usuario predeterminado"
+        }
+    }
+}

@@ -9,19 +9,16 @@ import Foundation
 
 class ApiNetworkDolarAlDia {
 
-    // Estructura principal del modelo
     struct DollarResponse: Codable {
         let datetime: DateTime
         let monitors: Monitors
     }
 
-    // Estructura de fecha y hora
     struct DateTime: Codable {
         let date: String
         let time: String
     }
 
-    // Estructura de los monitores (solo los que aparecen en tu JSON de ejemplo)
     struct Monitors: Codable {
         let bcv: MonitorDetail
         let bcvEur: MonitorDetail
@@ -34,7 +31,6 @@ class ApiNetworkDolarAlDia {
         }
     }
 
-    // Detalles de cada monitor
     struct MonitorDetail: Codable, Identifiable {
         var id: String { title }
         let change: Double
@@ -68,15 +64,17 @@ class ApiNetworkDolarAlDia {
         }
     }
 
-    // Función para obtener la información del dólar
+    // Función para obtener la información del dólar con headers
     func getDollarRates() async throws -> DollarResponse {
         let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar?page=alcambio")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        // Si la API requiere headers, agrégalos aquí
+        // Header igual que en tu ejemplo
+        request.setValue("Bearer 2x9Qjpxl5F8CoKK6T395KA", forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await URLSession.shared.data(for: request)
         let dollarResponse = try JSONDecoder().decode(DollarResponse.self, from: data)
         return dollarResponse
     }
 }
+
