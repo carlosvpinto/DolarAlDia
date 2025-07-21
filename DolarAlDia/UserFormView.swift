@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct UserFormView: View {
     @State private var alias: String = ""
@@ -13,6 +14,10 @@ struct UserFormView: View {
     @State private var idNumber: String = ""
     @State private var selectedBank: String = Constants.BANKS.first ?? ""
     @State private var selectedIdType: String = "V"
+
+    // Para imagen
+    @State private var selectedPhoto: PhotosPickerItem? = nil
+    @State private var uiImage: UIImage? = nil
 
     @Environment(\.presentationMode) var presentationMode
     var userDataManager = UserDataManager()
@@ -23,25 +28,65 @@ struct UserFormView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Datos del Pago Móvil")) {
-                    TextField("Alias", text: $alias)
-                        .autocapitalization(.words)
-                    TextField("Teléfono", text: $phone)
-                        .keyboardType(.numberPad)
+                Section(header: Text("Datos del Pago Móvil")){
+                    // NUEVO: Selector de imagen (mostrar al principio o el final)
                     HStack {
-                        Picker("Tipo", selection: $selectedIdType) {
-                            Text("V").tag("V")
-                            Text("E").tag("E")
-                            Text("J").tag("J")
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("Alias", text: $alias)
+                                .autocapitalization(.words)
+                            TextField("Teléfono", text: $phone)
+                                .keyboardType(.numberPad)
+                            HStack {
+                                Picker("Tipo", selection: $selectedIdType) {
+                                    Text("V").tag("V")
+                                    Text("E").tag("E")
+                                    Text("J").tag("J")
+                                }
+                                .pickerStyle(SegmentedPickerStyle())
+                                .frame(width: 100)
+                                TextField("Cédula/RIF", text: $idNumber)
+                                    .keyboardType(.numberPad)
+                            }
+                            Picker("Banco", selection: $selectedBank) {
+                                ForEach(Constants.BANKS, id: \.self) { bank in
+                                    Text(bank).tag(bank)
+                                }
+                            }
                         }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .frame(width: 100)
-                        TextField("Cédula/RIF", text: $idNumber)
-                            .keyboardType(.numberPad)
-                    }
-                    Picker("Banco", selection: $selectedBank) {
-                        ForEach(Constants.BANKS, id: \.self) { bank in
-                            Text(bank).tag(bank)
+                        Spacer()
+                        // Campo imagen
+                        PhotosPicker(
+                            selection: $selectedPhoto,
+                            matching: .images,
+                            photoLibrary: .shared()
+                        ) {
+                            if let uiImage = uiImage {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    
+                                    .frame(width: 54, height: 54)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                                    .shadow(radius: 1)
+                            } else {
+                                Image(systemName: "photo.badge.plus")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.leading, 4)
+                        .onChange(of: selectedPhoto) {
+                            if let newItem = selectedPhoto {
+                                Task {
+                                    if let data = try? await newItem.loadTransferable(type: Data.self),
+                                       let image = UIImage(data: data) {
+                                        uiImage = image
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -66,8 +111,13 @@ struct UserFormView: View {
                     idNumber = user.idNumber
                     selectedBank = user.bank
                     selectedIdType = user.idType
+                    // Carga la imagen si existe
+                    if let data = user.imageData, let savedImage = UIImage(data: data) {
+                        uiImage = savedImage
+                    }
                 }
             }
+
         }
     }
 
@@ -76,7 +126,12 @@ struct UserFormView: View {
         if let existingUser = user {
             userDataManager.delete(existingUser.id)
         }
-        let newUser = UserData(alias: alias, phone: phone, idNumber: idNumber, idType: selectedIdType, bank: selectedBank)
+        let newUser = UserData(alias: alias,
+                               phone: phone,
+                               idNumber: idNumber,
+                               idType: selectedIdType,
+                               bank: selectedBank,
+                               imageData: uiImage?.jpegData(compressionQuality: 0.5))
         userDataManager.save(user: newUser)
         userDataManager.saveDefaultUser(newUser)
         presentationMode.wrappedValue.dismiss()

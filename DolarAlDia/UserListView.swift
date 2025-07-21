@@ -19,7 +19,7 @@ struct UserListView: View {
                 List {
                     ForEach(users) { user in
                         HStack {
-                            // Botón check para usuario activo
+                            // CHECK Usuario activo
                             Button(action: {
                                 userDataManager.saveDefaultUser(user)
                                 selectedUser = user
@@ -30,7 +30,23 @@ struct UserListView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
 
-                            // Info usuario
+                            // IMAGEN miniatura de usuario (o icono si no tiene)
+                            if let data = user.imageData, let image = UIImage(data: data) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 48, height: 48)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                            } else {
+                                Image(systemName: "person.crop.square")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 48, height: 48)
+                                    .foregroundColor(.gray.opacity(0.45))
+                            }
+
+                            // DATOS DEL USUARIO
                             VStack(alignment: .leading) {
                                 Text(user.alias)
                                     .font(.headline)
@@ -47,7 +63,7 @@ struct UserListView: View {
 
                             Spacer()
 
-                            // Botón editar
+                            // BOTÓN editar
                             Button(action: {
                                 selectedUser = user
                                 isShowingUserForm = true
@@ -58,7 +74,7 @@ struct UserListView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
 
-                            // Botón eliminar
+                            // BOTÓN eliminar
                             Button(action: {
                                 deleteUser(user)
                             }) {
@@ -108,7 +124,6 @@ struct UserListView: View {
     private func deleteUser(_ user: UserData) {
         userDataManager.delete(user.id)
         users = userDataManager.load()
-        // Si el usuario eliminado era el seleccionado, actualiza el seleccionado
         if selectedUser?.id == user.id {
             selectedUser = userDataManager.loadDefaultUser()
         }

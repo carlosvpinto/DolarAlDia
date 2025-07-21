@@ -214,7 +214,6 @@ struct DolarAlDiaView: View {
             }
         }
     }
-
     func convertirDolaresABolivares() {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
@@ -224,14 +223,20 @@ struct DolarAlDiaView: View {
         numberFormatter.maximumFractionDigits = 2
 
         if isDolaresFocused {
-            let dolaresNormalizados = dolares.replacingOccurrences(of: ",", with: ".")
+            let dolaresNormalizados = normalizaNumero(dolares)
+            print("[DEBUG] dolares a bolivares normalizados:", dolaresNormalizados)  // <--- AQUÍ
+            guard !dolaresNormalizados.isEmpty else {
+                self.bolivares = ""
+                return
+            }
+
             if let dolares = Double(dolaresNormalizados) {
                 var tasa: Double = 0
                 switch selectedButton {
                 case Constants.DOLARBCV:
-                    tasa = Double(tasaBCV) ?? 0
+                    tasa = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0
                 case Constants.DOLAREUROBCV:
-                    tasa = Double(tasaEuro) ?? 0
+                    tasa = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0
                 default:
                     break
                 }
@@ -241,6 +246,8 @@ struct DolarAlDiaView: View {
                 } else {
                     self.bolivares = String(format: "%.2f", bolivares)
                 }
+            } else {
+                self.bolivares = ""
             }
         }
     }
@@ -254,14 +261,20 @@ struct DolarAlDiaView: View {
         numberFormatter.maximumFractionDigits = 2
 
         if !isDolaresFocused {
-            let bolivaresNormalizados = bolivares.replacingOccurrences(of: ",", with: ".")
+            let bolivaresNormalizados = normalizaNumero(bolivares)
+           
+            guard !bolivaresNormalizados.isEmpty else {
+                self.dolares = ""
+                return
+            }
+
             if let bolivares = Double(bolivaresNormalizados) {
                 var tasa: Double = 0
                 switch selectedButton {
                 case Constants.DOLARBCV:
-                    tasa = Double(tasaBCV) ?? 0
+                    tasa = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0
                 case Constants.DOLAREUROBCV:
-                    tasa = Double(tasaEuro) ?? 0
+                    tasa = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0
                 default:
                     break
                 }
@@ -273,9 +286,24 @@ struct DolarAlDiaView: View {
                         self.dolares = String(format: "%.2f", dolares)
                     }
                 }
+            } else {
+                self.dolares = ""
             }
         }
     }
+
+    // Convierte: "1.234,56", "1234,56", "1,234.56" (y similares) a "1234.56"
+    func normalizaNumero(_ valor: String) -> String {
+        // 1. Elimina los puntos de miles
+        var limpio = valor.replacingOccurrences(of: ".", with: "")
+        // 2. Cambia la coma decimal a punto
+        limpio = limpio.replacingOccurrences(of: ",", with: ".")
+        // Quita espacios
+        limpio = limpio.replacingOccurrences(of: " ", with: "")
+        return limpio
+    }
+
+
 
     func limpiarCampos() {
         dolares = ""

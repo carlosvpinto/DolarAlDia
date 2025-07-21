@@ -20,6 +20,8 @@
 		DB3C89142D0FA84600CB40CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89132D0FA84600CB40CE /* FirebaseCrashlytics */; };
 		DB3C89162D0FA84600CB40CE /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89152D0FA84600CB40CE /* FirebaseDatabase */; };
 		DB3C89182D0FA84600CB40CE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = DB3C89172D0FA84600CB40CE /* FirebaseFirestore */; };
+		DB61D04E2E182AD600DEE096 /* CameraScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB61D04D2E182AD000DEE096 /* CameraScannerView.swift */; };
+		DB61D0502E183DBF00DEE096 /* CameraPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB61D04F2E183DBA00DEE096 /* CameraPermissionManager.swift */; };
 		DB7C632B2DCFCB0A001CC983 /* BCVHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */; };
 		DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */; };
 		DBA82F812CFE44CE004A0C4F /* TextFieldPersonal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */; };
@@ -35,6 +37,8 @@
 		DB251C062D0573270000D82F /* ResultSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSheet.swift; sourceTree = "<group>"; };
 		DB251C0C2D064BAD0000D82F /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorListViewModel.swift; sourceTree = "<group>"; };
+		DB61D04D2E182AD000DEE096 /* CameraScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScannerView.swift; sourceTree = "<group>"; };
+		DB61D04F2E183DBA00DEE096 /* CameraPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionManager.swift; sourceTree = "<group>"; };
 		DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCVHistoryModels.swift; sourceTree = "<group>"; };
 		DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotonInfoPrecio.swift; sourceTree = "<group>"; };
 		DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPersonal.swift; sourceTree = "<group>"; };
@@ -112,6 +116,8 @@
 		DBA82F822CFEB862004A0C4F /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				DB61D04F2E183DBA00DEE096 /* CameraPermissionManager.swift */,
+				DB61D04D2E182AD000DEE096 /* CameraScannerView.swift */,
 				DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */,
 				DBA82F832CFEB876004A0C4F /* Model.swift */,
 				DB251C102D06CFDE0000D82F /* MonitorListViewModel.swift */,
@@ -228,7 +234,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB61D0502E183DBF00DEE096 /* CameraPermissionManager.swift in Sources */,
 				DBC0809A2D091C7800BF2923 /* LabeledTextFieldWithIcon.swift in Sources */,
+				DB61D04E2E182AD600DEE096 /* CameraScannerView.swift in Sources */,
 				DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */,
 				DB251C072D0573270000D82F /* ResultSheet.swift in Sources */,
 				DB7C632B2DCFCB0A001CC983 /* BCVHistoryModels.swift in Sources */,
@@ -372,7 +380,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
@@ -380,6 +388,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DolarAlDia/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dolar Al Dia";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Acceso a la Camara para leer numeros y realizar las conversiones";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -390,7 +399,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -406,13 +415,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DolarAlDia/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dolar Al Dia";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Acceso a la Camara para leer numeros y realizar las conversiones";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -423,7 +433,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

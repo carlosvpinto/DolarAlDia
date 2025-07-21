@@ -23,8 +23,12 @@ struct ContentView: View {
     @State private var navigateToUserList = false
     @State private var userToEdit: UserData?
     @State private var defaultUser: UserData?
-    @State private var isMenuOpen: Bool = false // Controla el estado del menú
-    @State private var showingConfirmationDialog = false // Nuevo estado para el diálogo de confirmación
+    @State private var isMenuOpen: Bool = false
+    @State private var showingConfirmationDialog = false
+
+    @State private var mostrarDialogoImagen = false
+    @State private var compartirTexto: String = ""
+    @State private var compartirImagenDePago: UIImage? = nil
 
     private let userDataManager = UserDataManager()
 
@@ -33,8 +37,7 @@ struct ContentView: View {
             ZStack(alignment: .topLeading) {
                 VStack {
                     Spacer()
-
-                    // Mostrar contenido según la sección seleccionada
+                    
                     if selectedSection == Constants.DOLARALDIA {
                         DolarAlDiaView(
                             dolares: $dolares,
@@ -66,7 +69,6 @@ struct ContentView: View {
                     }
                     if selectedSection == Constants.HISTORIA_PARALELO{
                         HStack {
-                            // Dólar Paralelo
                             BCVHistoryView(
                                 imgUrl: "https://res.cloudinary.com/dcpyfqx87/image/upload/v1729921479/monitors/public_id:epv.webp",
                                 navigationTitle: "Historia Dólar Paralelo",
@@ -83,7 +85,7 @@ struct ContentView: View {
                 .onTapGesture {
                     UIApplication.shared.endEditing()
                 }
-                // NUEVO: Capa semitransparente para detectar toques fuera del menú
+                
                 if isMenuOpen {
                     Color.black.opacity(0.3)
                         .edgesIgnoringSafeArea(.all)
@@ -96,9 +98,8 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    // Botón de menú en el toolbar
                     Button(action: {
-                        UIApplication.shared.endEditing() // Cierra el teclado si está abierto
+                        UIApplication.shared.endEditing()
                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                             isMenuOpen.toggle()
                         }
@@ -109,35 +110,51 @@ struct ContentView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    // Botón de compartir en el toolbar
                     Button(action: {
-                        showingConfirmationDialog = true // Mostrar el diálogo de confirmación
+                        showingConfirmationDialog = true
                     }) {
                         Image(systemName: "square.and.arrow.up")
                             .imageScale(.large)
                     }
                 }
             }
+
+            // Primer diálogo: ¿Compartir datos de pago móvil?
             .confirmationDialog(
                 "¿Compartir datos de pago móvil?",
                 isPresented: $showingConfirmationDialog,
                 titleVisibility: .visible
             ) {
-                Button("SI", action: {
-                    compartirCapturaConTexto(incluirDatosUsuario: true) // Compartir con datos de usuario
-                })
-                Button("NO", action: {
-                    compartirCapturaConTexto(incluirDatosUsuario: false) // Compartir sin datos de usuario
-                })
-                Button("Cancelar", role: .cancel) {
-                    // No hacer nada
+                Button("SI") {
+                    compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: true)
+                    mostrarDialogoImagen = true
                 }
+                Button("NO") {
+                    compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: false)
+                    compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                }
+                Button("Cancelar", role: .cancel) { }
+            }
+
+            // Segundo diálogo: ¿Incluir imagen personalizada?
+            .confirmationDialog(
+                "¿Deseas incluir tu imagen personalizada de pago móvil?",
+                isPresented: $mostrarDialogoImagen,
+                titleVisibility: .visible
+            ) {
+                Button("Sí, incluir imagen") {
+                    compartirCapturaConTextoYImagen(compartirImagenDePago: true)
+                }
+                Button("No incluir imagen") {
+                    compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                }
+                Button("Cancelar", role: .cancel) { }
             }
             .overlay(
                 MenuView(selectedSection: $selectedSection, isMenuOpen: $isMenuOpen)
-                    .frame(maxWidth: isMenuOpen ? 350 : 0) // Ajustar el ancho del menú
+                    .frame(maxWidth: isMenuOpen ? 350 : 0)
                     .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isMenuOpen)
-                    .offset(x: isMenuOpen ? 0 : -250) // Mover el menú hacia la izquierda cuando está cerrado
+                    .offset(x: isMenuOpen ? 0 : -250)
             )
             .gesture(
                 TapGesture()
@@ -151,23 +168,17 @@ struct ContentView: View {
             )
         }
     }
-
-    func compartirCapturaConTexto(incluirDatosUsuario: Bool) {
-        // Capturar la pantalla
+    
+    // NUEVA FUNCIÓN: Compartir con/sin imagen personalizada
+    func compartirCapturaConTextoYImagen(compartirImagenDePago: Bool) {
         guard let capturaPantalla = tomarCapturaDePantalla() else { return }
-
-        // Texto personalizado para compartir
-        let textoParaCompartir = generarTextoParaCompartir(incluirDatosUsuario: incluirDatosUsuario)
-
-        // Crear el UIActivityViewController con la imagen y el texto
-        let itemsParaCompartir: [Any] = [capturaPantalla, textoParaCompartir]
+        var itemsParaCompartir: [Any] = [capturaPantalla, compartirTexto]
+        if compartirImagenDePago, let imagenPersonalizada = obtenerImagenUsuarioPredeterminado() {
+            itemsParaCompartir.insert(imagenPersonalizada, at: 0) // opcional: al inicio
+        }
         let activityViewController = UIActivityViewController(activityItems: itemsParaCompartir, applicationActivities: nil)
-
-        // Obtener la escena activa y presentar el ActivityViewController
-        if let scene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+        if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
            let rootViewController = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController {
-
             rootViewController.present(activityViewController, animated: true, completion: nil)
         }
     }
@@ -180,7 +191,6 @@ struct ContentView: View {
                 .first(where: { $0.isKeyWindow }) else {
             return nil
         }
-
         let renderer = UIGraphicsImageRenderer(size: ventana.bounds.size)
         let imagen = renderer.image { ctx in
             ventana.drawHierarchy(in: ventana.bounds, afterScreenUpdates: true)
@@ -190,7 +200,6 @@ struct ContentView: View {
 
     func generarTextoParaCompartir(incluirDatosUsuario: Bool) -> String {
         var textoCompartir = ""
-
         if dolares != "" {
             if selectedButton == Constants.DOLARBCV {
                 textoCompartir = "-Tasa BCV: \(tasaBCV) \n-Monto en Dólares: \(dolares)\n-Monto en Bolívares: \(bolivares)"
@@ -200,18 +209,14 @@ struct ContentView: View {
         } else {
             textoCompartir = "-Dólar BCV: \(tasaBCV) \n-Euro BCV: \(tasaEuroBcv)\n"
         }
-
         if incluirDatosUsuario {
             textoCompartir += " \n \(loadDefaultUser())"
         }
-
         return textoCompartir
     }
 
-    // Función para cargar el usuario predeterminado
     private func loadDefaultUser() -> String {
         defaultUser = userDataManager.loadDefaultUser()
-
         if let defaultUser = defaultUser {
             var datosPagomovil = "*Datos del Pago Móvil:*\n"
             datosPagomovil += " Banco: \(defaultUser.bank)\n"
@@ -221,5 +226,14 @@ struct ContentView: View {
         } else {
             return "*Datos del Pago Móvil:*\n No hay usuario predeterminado"
         }
+    }
+    
+    // DEVUELVE LA IMAGEN DEL USUARIO PREDETERMINADO
+    func obtenerImagenUsuarioPredeterminado() -> UIImage? {
+        let user = userDataManager.loadDefaultUser()
+        if let data = user?.imageData, let imagen = UIImage(data: data) {
+            return imagen
+        }
+        return nil
     }
 }

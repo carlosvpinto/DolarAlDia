@@ -15,5 +15,6 @@ struct UserData: Identifiable, Codable {
     var idNumber: String
     var idType: String  // Agrega esta línea
     var bank: String
+    var imageData: Data? // <-- NUEVO imagen
 }
 
