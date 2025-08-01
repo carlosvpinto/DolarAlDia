@@ -11,6 +11,8 @@ import Firebase
 import FirebaseMessaging
 
 
+
+
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
   func application(_ application: UIApplication,
@@ -50,11 +52,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 @main
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    @StateObject private var userSession = UserSession()
     var body: some Scene {
         WindowGroup {
           //  MenuView()
           //  DolarAlDiaView()
             ContentView()
+                .environmentObject(userSession)
         }
     }
 }

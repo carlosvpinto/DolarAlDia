@@ -14,25 +14,45 @@ class UserDataManager {
 
     // Guardar un usuario nuevo
     func save(user: UserData) {
-        var users = load() // Cargar usuarios existentes
+        var users = load()
         if let index = users.firstIndex(where: { $0.id == user.id }) {
-            users[index] = user // Si el usuario existe, modificarlo
+            users[index] = user
         } else {
-            users.append(user) // Si no existe, agregarlo
+            users.append(user)
         }
         saveUsers(users)
     }
 
+    // --- FUNCIÓN CORREGIDA ---
     // Eliminar un usuario
     func delete(_ id: String) {
-        var users = load() // Cargar usuarios existentes
-        users.removeAll { $0.id == id } // Eliminar el usuario por ID
+        // 1. Cargar usuarios existentes
+        var users = load()
+        
+        // 2. Comprobar si el usuario a eliminar es el predeterminado
+        if let defaultUser = loadDefaultUser(), defaultUser.id == id {
+            // Si es el predeterminado, lo eliminamos de UserDefaults.
+            UserDefaults.standard.removeObject(forKey: defaultUserKey)
+            print("Usuario predeterminado eliminado.")
+        }
+        
+        // 3. Eliminar el usuario de la lista principal
+        users.removeAll { $0.id == id }
+        
+        // 4. Guardar la nueva lista de usuarios
         saveUsers(users)
+        
+        // 5. (Opcional pero recomendado) Si no queda un usuario por defecto
+        // y todavía hay usuarios en la lista, establecer el primero como nuevo default.
+        if loadDefaultUser() == nil, let newDefault = users.first {
+            saveDefaultUser(newDefault)
+            print("Se ha establecido un nuevo usuario predeterminado.")
+        }
     }
 
     // Modificar un usuario
     func modify(user: UserData) {
-        save(user: user) // Reutilizamos la función de guardar para modificar
+        save(user: user)
     }
 
     // Cargar la lista de usuarios desde UserDefaults
@@ -43,7 +63,7 @@ class UserDataManager {
                 return users
             }
         }
-        return [] // Retornar lista vacía si no hay datos guardados
+        return []
     }
 
     // Guardar el usuario predeterminado
@@ -71,4 +91,3 @@ class UserDataManager {
         }
     }
 }
-

@@ -76,5 +76,6 @@ struct BCVHistoryView: View {
                 service.fetchHistory(page: page, monitor: monitor)
             }
         }
+        .navigationViewStyle(.stack)
     }
 }

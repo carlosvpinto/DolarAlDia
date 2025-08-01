@@ -12,26 +12,37 @@ struct MonitorBcvListView: View {
 
     var body: some View {
         NavigationView {
+            // Usamos un ZStack como base para poder superponer la vista de carga.
             ZStack {
-                // Fondo sutil para la app de finanzas
+               
                 Color(.systemGray6)
                     .edgesIgnoringSafeArea(.all)
 
+                // La vista principal que contiene la lista o el mensaje de error.
                 VStack {
-                    if viewModel.isLoading {
-                        ProgressView("Cargando...")
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
-                            .shadow(radius: 5)
-                    } else if let errorMessage = viewModel.errorMessage {
-                        Text("Error: \(errorMessage)")
-                            .foregroundColor(.red)
-                            .padding()
+                    if let errorMessage = viewModel.errorMessage {
+                        // Mostramos un mensaje de error más visual y centrado.
+                        VStack {
+                            Spacer()
+                            Image(systemName: "wifi.exclamationmark")
+                                .font(.largeTitle)
+                                .foregroundColor(.gray)
+                            Text("Error al Cargar")
+                                .font(.headline)
+                                .padding(.top, 5)
+                            Text(errorMessage)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                            Spacer()
+                        }
                     } else {
+                        // La lista siempre está presente en el árbol de vistas,
+                        // lo que permite que el indicador de carga se superponga sobre ella.
                         List(viewModel.monitors, id: \.title) { monitor in
                             HStack(spacing: 15) {
-                                // Verifica si monitor.image tiene valor y genera la URL
+                                // Celda de imagen
                                 if let imageUrl = monitor.image, let url = URL(string: imageUrl) {
                                     AsyncImage(url: url) { image in
                                         image
@@ -42,9 +53,9 @@ struct MonitorBcvListView: View {
                                             .shadow(radius: 4)
                                     } placeholder: {
                                         ProgressView()
+                                            .frame(width: 50, height: 50)
                                     }
                                 } else {
-                                    // Imagen predeterminada si monitor.image es nil o URL inválida
                                     Image(systemName: "photo.artframe.circle.fill")
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
@@ -53,24 +64,20 @@ struct MonitorBcvListView: View {
                                         .shadow(radius: 4)
                                 }
 
+                                // Contenido de texto
                                 VStack(alignment: .leading, spacing: 5) {
-                                    // Título del monitor
                                     Text(monitor.title)
                                         .font(.headline)
                                         .foregroundColor(.primary)
                                     
-                                    // Precio actual
                                     Text("Precio: \(monitor.price, specifier: "%.2f") USD")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                     
-                                    // Cambio con color dinámico
                                     Text("Cambio: \(monitor.change, specifier: "%.2f") \(monitor.symbol)")
                                         .font(.subheadline)
-                                        //.foregroundColor(monitor.color == "green" ? .green : .red)
-                                        .foregroundColor(getColor(for: monitor.color)) 
+                                        .foregroundColor(getColor(for: monitor.color))
                                     
-                                    // Última actualización
                                     Text("Última actualización: \(monitor.lastUpdate)")
                                         .font(.caption)
                                         .foregroundColor(.gray)
@@ -78,49 +85,73 @@ struct MonitorBcvListView: View {
 
                                 Spacer()
 
-                                // Icono de estado basado en el cambio (arriba/abajo) o imagen cuando no hay cambio
+                                // Icono de estado
                                 if monitor.symbol.isEmpty {
                                     Image(systemName: "arrowshape.left.arrowshape.right.fill")
                                         .foregroundColor(.gray)
                                         .font(.title2)
                                 } else {
                                     Image(systemName: monitor.symbol == "▲" ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                                        .foregroundColor(getColor(for: monitor.color)) // Color dinámico también para el icono
+                                        .foregroundColor(getColor(for: monitor.color))
                                         .font(.title2)
                                 }
                             }
                             .padding(.vertical, 10)
-                        
                         }
-                        .listStyle(InsetGroupedListStyle()) // Mejor estilo de lista
+                        .listStyle(InsetGroupedListStyle())
                     }
                 }
-                .navigationTitle("Precio en Bancos")
-                .navigationBarTitleDisplayMode(.inline)
+                
+                // Si está cargando, mostramos nuestra nueva vista de carga encima de todo.
+                if viewModel.isLoading {
+                    LoadingView()
+                        .transition(.opacity.animation(.easeInOut(duration: 0.3))) // Animación suave
+                }
             }
+            .navigationTitle("Precio en Bancos")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                viewModel.fetchMonitors()
+                // Solo llama a la API la primera vez que la vista aparece
+                // si no hay datos. El resto de las veces se usará el botón de refrescar.
+                if viewModel.monitors.isEmpty {
+                    viewModel.fetchMonitors()
+                }
+            }
+            // Añadimos un botón en la barra de navegación para refrescar manualmente.
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        viewModel.fetchMonitors()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .disabled(viewModel.isLoading) // Desactiva el botón mientras ya está cargando
+                }
             }
         }
+        .navigationViewStyle(.stack)
     }
+
     // Función auxiliar para determinar el color según el valor de monitor.color
-       private func getColor(for color: String) -> Color {
-           switch color {
-           case "green":
-               return .green
-           case "red":
-               return .red
-           case "neutral":
-               return .gray
-           default:
-               return .gray // Color predeterminado si no es green, red, o neutral
-           }
-       }
+    private func getColor(for color: String) -> Color {
+        switch color {
+        case "green":
+            return .green
+        case "red":
+            return .red
+        case "neutral":
+            return .gray
+        default:
+            return .gray
+        }
+    }
 }
 
 // Vista previa para SwiftUI
 struct MonitorBcvListView_Previews: PreviewProvider {
     static var previews: some View {
+        // Para probar, puedes crear un ViewModel simulado si es necesario
+        // o simplemente instanciar la vista directamente.
         MonitorBcvListView()
     }
 }

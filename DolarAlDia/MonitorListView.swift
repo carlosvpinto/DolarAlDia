@@ -91,6 +91,7 @@ struct MonitorListView: View {
                 viewModel.fetchData()
             }
         }
+        .navigationViewStyle(.stack)
     }
     // Función auxiliar para determinar el color según el valor de monitor.color
        private func getColor(for color: String) -> Color {

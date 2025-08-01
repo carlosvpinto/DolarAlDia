@@ -12,6 +12,9 @@ struct UserListView: View {
     @State private var selectedUser: UserData? = nil
     @State private var isShowingUserForm = false
     let userDataManager = UserDataManager()
+    
+    // MARK: - Accedemos al UserSession compartido
+       @EnvironmentObject var userSession: UserSession
 
     var body: some View {
         NavigationView {
@@ -101,33 +104,49 @@ struct UserListView: View {
                 }
             }
             .sheet(isPresented: $isShowingUserForm) {
-                UserFormView(
-                    user: selectedUser,
-                    onSave: {
-                        users = userDataManager.load()
-                        selectedUser = userDataManager.loadDefaultUser()
-                        isShowingUserForm = false
-                    },
-                    onCancel: {
-                        selectedUser = userDataManager.loadDefaultUser()
-                        isShowingUserForm = false
+                            UserFormView(
+                                user: selectedUser,
+                                onSave: {
+                                    // MARK: Después de guardar, recargar datos y notificar a UserSession
+                                    users = userDataManager.load()
+                                    selectedUser = userDataManager.loadDefaultUser()
+                                    userSession.verificarUsuarioGuardado() // <-- ¡Importante! Notificar a UserSession
+                                    isShowingUserForm = false
+                                },
+                                onCancel: {
+                                    selectedUser = userDataManager.loadDefaultUser()
+                                    isShowingUserForm = false
+                                }
+                            )
+                            // Asegúrate de inyectar UserSession también en UserFormView si lo necesita.
+                            // .environmentObject(userSession) // Descomentar si UserFormView lo usa
+                        }
+                        .onAppear {
+                            // Siempre que esta vista aparezca, recargamos y sincronizamos el estado global.
+                            reloadData()
+                        }
                     }
-                )
-            }
-            .onAppear {
-                users = userDataManager.load()
-                selectedUser = userDataManager.loadDefaultUser()
-            }
-        }
-    }
-
+            .navigationViewStyle(.stack)
+                }
+    
+    private func reloadData() {
+           users = userDataManager.load()
+           selectedUser = userDataManager.loadDefaultUser()
+           userSession.verificarUsuarioGuardado() // <-- ¡Importante! Notificar a UserSession
+       }
+    
+    
     private func deleteUser(_ user: UserData) {
-        userDataManager.delete(user.id)
-        users = userDataManager.load()
-        if selectedUser?.id == user.id {
-            selectedUser = userDataManager.loadDefaultUser()
-        }
-    }
+           userDataManager.delete(user.id)
+           
+           // Si el usuario eliminado era el predeterminado, necesitamos que UserDataManager
+           // actualice su defaultUser a nil o a otro usuario si existe.
+           // Asumo que tu userDataManager ya maneja esto internamente.
+           // Si no, la línea 'selectedUser = userDataManager.loadDefaultUser()' es clave.
+           
+           // MARK: Después de eliminar, recargar y notificar a UserSession
+           reloadData() // Esto ya llama a userSession.verificarUsuarioGuardado()
+       }
 }
 
 struct UserListView_Previews: PreviewProvider {
