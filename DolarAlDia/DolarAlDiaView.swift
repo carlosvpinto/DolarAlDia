@@ -25,19 +25,16 @@ struct DolarAlDiaView: View {
     @State private var porcentajeBcv: String = ""
     @State private var simboloBcv: String = ""
     @State private var simboloParalelo: String = ""
-    @State private var fechaActualizacionParalelo: String = "29/11/2024, 01:39 PM"
-    @State private var fechaActualizacionBCV: String = "02/12/2024"
+    @State private var fechaActualizacionParalelo: String = "Cargando..."
+    @State private var fechaActualizacionBCV: String = "Cargando..."
     @State private var isLoading: Bool = false
     @State private var showToast: Bool = false
     
-    // @FocusState por uno que usa nuestro enum.
-        @FocusState private var campoEnfocado: CampoDeEnfoque?
+    @FocusState private var campoEnfocado: CampoDeEnfoque?
     
-    // Nuevos estados para la conexión y mensajes
-       @State private var isOffline: Bool = false
-       @State private var statusMessage: String? = nil
+    @State private var isOffline: Bool = false
+    @State private var statusMessage: String? = nil
     
-    //para controlar la animación de la fecha
     @State private var animateDateUpdate: Bool = false
 
     @State private var cantidadDolares: String = ""
@@ -63,10 +60,6 @@ struct DolarAlDiaView: View {
             VStack(spacing: 20) {
                 GeometryReader { geometry in
                     VStack(spacing: 10) {
-                      //  let screenWidth = UIScreen.main.bounds.width
-                      //  let padding: CGFloat = 40
-                     //   let buttonWidth = (screenWidth - padding) / 2
-
                         Image("logoredondo")
                             .resizable()
                             .scaledToFit()
@@ -91,9 +84,8 @@ struct DolarAlDiaView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: -10) {
                                 HStack {
-                                    // Paso 4: Vinculamos el TextField de Dólares al nuevo @FocusState.
                                     TextFieldPersonal(placeholder: placeholderMoneda, startIcon: startIconMoneda, text: $dolares, onClearAll: limpiarCampos)
-                                        .focused($campoEnfocado, equals: .dolares) // <-- CAMBIO
+                                        .focused($campoEnfocado, equals: .dolares)
                                         .onChange(of: dolares) {
                                             convertirDolaresABolivares()
                                         }
@@ -109,7 +101,7 @@ struct DolarAlDiaView: View {
                                 }
                                 HStack {
                                     TextFieldPersonal(placeholder: "Bolivares", startIcon: "icon-bs", text: $bolivares, onClearAll: limpiarCampos)
-                                        .focused($campoEnfocado, equals: .bolivares) // <-- CAMBIO
+                                        .focused($campoEnfocado, equals: .bolivares)
                                         .onChange(of: bolivares) {
                                             convertirBolivaresADolares()
                                         }
@@ -144,15 +136,9 @@ struct DolarAlDiaView: View {
                             .stroke(Color.black, lineWidth: 2)
                     )
                 }
-        
-                
             }
             .padding()
             .onAppear {
-                
-                // 1. Al aparecer la vista, primero cargamos los datos cacheados.
-               
-                
                 Task {
                     await cargarDatosCacheados()
                     isLoading = true
@@ -172,8 +158,6 @@ struct DolarAlDiaView: View {
                     Spacer()
                 
                 HStack(alignment: .center, spacing: 15) {
-                    // MARK: - Paso 3: Icono de sin conexión
-                    // Este icono solo aparecerá si isOffline es true.
                     if isOffline {
                         Image(systemName: "wifi.exclamationmark")
                             .font(.title2)
@@ -186,16 +170,11 @@ struct DolarAlDiaView: View {
                         Text("Act. BCV: \(fechaActualizacionBCV.components(separatedBy: ",").first ?? fechaActualizacionBCV)")
                                .font(.body)
                                .fontWeight(.bold)
-                               // El color del texto cambia a verde cuando se activa la animación.
                                .foregroundColor(animateDateUpdate ? .green : .gray)
-                               // El tamaño del texto aumenta ligeramente para un efecto "pulso".
                                .scaleEffect(animateDateUpdate ? 1.1 : 1.0)
-                               // Añadimos una sombra brillante para el efecto "glow".
                                .shadow(color: animateDateUpdate ? .green.opacity(0.5) : .clear, radius: 5, x: 0, y: 0)
                                .padding(.bottom, 2)
-
-                         
-                       
+                        
                         Button(action: {
                             Task {
                                 isLoading = true
@@ -211,7 +190,7 @@ struct DolarAlDiaView: View {
                     }
                     .padding(.bottom, 30)
                 }
-                .ignoresSafeArea(.keyboard) // <
+                .ignoresSafeArea(.keyboard)
 
             if showToast {
                 ZStack {
@@ -245,29 +224,38 @@ struct DolarAlDiaView: View {
                     }
                 }
             }
-            // Muestra un banner en la parte inferior si hay un mensaje.
-                       if let message = statusMessage {
-                           VStack {
-                               Spacer()
-                               Text(message)
-                                   .font(.headline)
-                                   .foregroundColor(.white)
-                                   .padding()
-                                   .background(.black.opacity(0.6))
-                                   .clipShape(Capsule())
-                                   .transition(.move(edge: .bottom).combined(with: .opacity))
-                           }
-                           .padding(.bottom, 140) // Ajusta la posición vertical del mensaje
-                       }
-                   }
-                   .onTapGesture {
-                       campoEnfocado = nil
-                   }
+
+            if let message = statusMessage {
+               VStack {
+                   Spacer()
+                   Text(message)
+                       .font(.headline)
+                       .foregroundColor(.white)
+                       .padding()
+                       .background(.black.opacity(0.6))
+                       .clipShape(Capsule())
+                       .transition(.move(edge: .bottom).combined(with: .opacity))
+               }
+               .padding(.bottom, 140)
+           }
+       }
+       .onTapGesture {
+           campoEnfocado = nil
+       }
     }
     
+    // --- NUEVA FUNCIÓN HELPER ---
+    // Convierte una cadena de texto a un objeto Date
+    private func parseDate(from dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy, hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX") // Importante para AM/PM
+        return formatter.date(from: dateString)
+    }
+
     private var isDolaresFocused: Bool {
-          campoEnfocado == .dolares
-      }
+        campoEnfocado == .dolares
+    }
 
     func showToastMessage() {
         withAnimation {
@@ -281,23 +269,23 @@ struct DolarAlDiaView: View {
     }
     
     func cargarDatosCacheados() async {
-           if let cachedData = CacheManager.shared.load() {
-               // Actualizamos la UI con los datos del caché
-               self.tasaBCV = String(format: "%.2f", cachedData.tasaBCV)
-               self.tasaEuro = String(format: "%.2f", cachedData.tasaEuro)
-               self.porcentajeBcv = cachedData.porcentajeBcv
-               self.porcentajeParalelo = cachedData.porcentajeParalelo
-               self.simboloBcv = cachedData.simboloBcv
-               self.simboloParalelo = cachedData.simboloParalelo
-               self.fechaActualizacionBCV = cachedData.fechaActualizacionBCV
-               self.fechaActualizacionParalelo = cachedData.fechaActualizacionParalelo
-               
-               print("Datos cargados desde el caché.")
-           } else {
-               print("No se encontraron datos en el caché.")
-           }
-       }
+        if let cachedData = CacheManager.shared.load() {
+            self.tasaBCV = String(format: "%.2f", cachedData.tasaBCV)
+            self.tasaEuro = String(format: "%.2f", cachedData.tasaEuro)
+            self.porcentajeBcv = cachedData.porcentajeBcv
+            self.porcentajeParalelo = cachedData.porcentajeParalelo
+            self.simboloBcv = cachedData.simboloBcv
+            self.simboloParalelo = cachedData.simboloParalelo
+            self.fechaActualizacionBCV = cachedData.fechaActualizacionBCV
+            self.fechaActualizacionParalelo = cachedData.fechaActualizacionParalelo
+            print("Datos cargados desde el caché.")
+        } else {
+            print("No se encontraron datos en el caché.")
+        }
+    }
+    
     func convertirDolaresABolivares() {
+        // ... (sin cambios en esta función)
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = "."
@@ -307,7 +295,6 @@ struct DolarAlDiaView: View {
 
         if isDolaresFocused {
             let dolaresNormalizados = normalizaNumero(dolares)
-            print("[DEBUG] dolares a bolivares normalizados:", dolaresNormalizados)  // <--- AQUÍ
             guard !dolaresNormalizados.isEmpty else {
                 self.bolivares = ""
                 return
@@ -336,6 +323,7 @@ struct DolarAlDiaView: View {
     }
 
     func convertirBolivaresADolares() {
+        // ... (sin cambios en esta función)
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.groupingSeparator = "."
@@ -345,7 +333,6 @@ struct DolarAlDiaView: View {
 
         if !isDolaresFocused {
             let bolivaresNormalizados = normalizaNumero(bolivares)
-           
             guard !bolivaresNormalizados.isEmpty else {
                 self.dolares = ""
                 return
@@ -375,18 +362,13 @@ struct DolarAlDiaView: View {
         }
     }
 
-    // Convierte: "1.234,56", "1234,56", "1,234.56" (y similares) a "1234.56"
     func normalizaNumero(_ valor: String) -> String {
-        // 1. Elimina los puntos de miles
+        // ... (sin cambios en esta función)
         var limpio = valor.replacingOccurrences(of: ".", with: "")
-        // 2. Cambia la coma decimal a punto
         limpio = limpio.replacingOccurrences(of: ",", with: ".")
-        // Quita espacios
         limpio = limpio.replacingOccurrences(of: " ", with: "")
         return limpio
     }
-
-
 
     func limpiarCampos() {
         dolares = ""
@@ -394,101 +376,145 @@ struct DolarAlDiaView: View {
     }
 
     func llamarApiDolar() async {
-            do {
-                print("🚀 Iniciando llamada a la API de Dólar...")
-                let apiService = ApiNetworkDolarAlDia()
-                let dollarData = try await apiService.getDollarRates()
+        do {
+            print("🚀 Iniciando llamada a la API de Dólar...")
+            let apiService = ApiNetworkDolarAlDia()
+            let dollarData = try await apiService.getDollarRates()
+            
+            let now = Date() // Obtenemos la fecha y hora actual una sola vez.
 
-                // --- CAMBIO IMPORTANTE ---
-                // Cuando la API responde con éxito:
+            var tasaBCVCache: Double = 0
+            var tasaEuroCache: Double = 0
+            var porcentajeBcvCache: String = ""
+            var porcentajeParaleloCache: String = ""
+            var simboloBcvCache: String = ""
+            var simboloParaleloCache: String = ""
+            var fechaBcvCache: String = ""
+            var fechaEuroCache: String = ""
+            
+            // --- Procesamos el Dólar (USD) con la nueva lógica ---
+            if let usdMonitor = dollarData.monitors["usd"] {
+                // Parseamos la fecha de actualización para poder compararla.
+                let lastUpdateDate = parseDate(from: usdMonitor.lastUpdate) ?? now
                 
-                // 1. Actualizamos la UI (lo que ya hacías)
-                tasaBCV = String(format: "%.2f", dollarData.monitors.bcv.price)
-                tasaEuro = String(format: "%.2f", dollarData.monitors.bcvEur.price)
-                porcentajeBcv = dollarData.monitors.bcv.percent.description
-                porcentajeParalelo = dollarData.monitors.bcvEur.percent.description
-                simboloBcv = dollarData.monitors.bcv.symbol
-                simboloParalelo = dollarData.monitors.bcvEur.symbol
-                fechaActualizacionBCV = dollarData.monitors.bcv.lastUpdate
-                fechaActualizacionParalelo = dollarData.monitors.bcvEur.lastUpdate
-                calcularDiferencia()
+                // Decidimos si usamos los datos antiguos ('old') o los actuales.
+                let useOldData = lastUpdateDate > now
                 
-                print("✅ ¡Éxito! Datos decodificados correctamente. Tasa BCV: \(dollarData.monitors.bcv.price)")
-                // 2. Creamos un objeto para el caché
-                let dataToCache = DollarDataCache(
-                    tasaBCV: dollarData.monitors.bcv.price,
-                    tasaEuro: dollarData.monitors.bcvEur.price,
-                    porcentajeBcv: dollarData.monitors.bcv.percent.description,
-                    porcentajeParalelo: dollarData.monitors.bcvEur.percent.description,
-                    simboloBcv: dollarData.monitors.bcv.symbol,
-                    simboloParalelo: dollarData.monitors.bcvEur.symbol,
-                    fechaActualizacionBCV: dollarData.monitors.bcv.lastUpdate,
-                    fechaActualizacionParalelo: dollarData.monitors.bcvEur.lastUpdate,
-                    timestamp: Date() // Guardamos la fecha actual
-                )
-                if isOffline {
-                    isOffline = false
-                    showStatusMessage("¡Conexión restablecida!")
-                    // 3. Guardamos los nuevos datos en el caché
-                    CacheManager.shared.save(data: dataToCache)
-                    
-                }
-                await MainActor.run {
-                    // 1. Activamos la animación con un efecto de resorte.
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
-                        animateDateUpdate = true
-                    }
-                    
-                    // 2. Después de un segundo, desactivamos la animación para que vuelva a su estado normal.
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        withAnimation(.easeInOut) {
-                            animateDateUpdate = false
-                        }
-                    }
-                }
-
-             
+                let priceToUse = useOldData ? usdMonitor.priceOld : usdMonitor.price
+                let percentToUse = useOldData ? (usdMonitor.percentOld ?? 0.0) : usdMonitor.percent
+                let lastUpdateToUse = useOldData ? (usdMonitor.lastUpdateOld ?? "N/A") : usdMonitor.lastUpdate
                 
-                print("Nuevos datos de la API guardados en caché.")
-
-            } catch {
-                // Si la API falla, no hacemos nada. La vista ya estará mostrando
-                // los últimos datos válidos que cargamos desde el caché.
-                // 1. Activamos el estado de "sin conexión"
-                print("❌ ERROR en llamarApiDolar: \(error)")
-                      print("❌ Descripción localizada del error: \(error.localizedDescription)")
-
-                isOffline = true
+                // Asignamos los valores a la UI
+                tasaBCV = String(format: "%.2f", priceToUse)
+                porcentajeBcv = String(format: "%.2f", percentToUse)
+                simboloBcv = usdMonitor.symbol
+                fechaActualizacionBCV = lastUpdateToUse
                 
-                // 2. Mostramos un mensaje de error al usuario
-                showStatusMessage("No se pudo actualizar. Verifique su conexión.")
+                // Guardamos los valores para el caché
+                tasaBCVCache = priceToUse
+                porcentajeBcvCache = String(format: "%.2f", percentToUse)
+                simboloBcvCache = usdMonitor.symbol
+                fechaBcvCache = lastUpdateToUse
                 
-                // 3. ¡AÑADIMOS LA VIBRACIÓN DE ERROR!
-                HapticManager.shared.play(.error)
-                
-        
-                print("Error al obtener las tasas de dólar desde la API: \(error). Se mantendrán los datos cacheados.")
+                print(useOldData ? "✅ Datos USD (OLD) procesados." : "✅ Datos USD (Current) procesados.")
+            } else {
+                print("⚠️ No se encontró el monitor 'usd' en la respuesta.")
             }
-        }
-    // Nueva función para mostrar mensajes temporales
-       func showStatusMessage(_ message: String) {
-           // Usamos MainActor para asegurar que la actualización de la UI ocurra en el hilo principal
-           Task { @MainActor in
-               self.statusMessage = message
-               // Hacemos que el mensaje desaparezca después de 3 segundos
-               try? await Task.sleep(nanoseconds: 3_000_000_000)
-               self.statusMessage = nil
-           }
-       }
-        
-    
 
+            // --- Procesamos el Euro (EUR) con la nueva lógica ---
+            if let eurMonitor = dollarData.monitors["eur"] {
+                let lastUpdateDate = parseDate(from: eurMonitor.lastUpdate) ?? now
+                let useOldData = lastUpdateDate > now
+
+                let priceToUse = useOldData ? eurMonitor.priceOld : eurMonitor.price
+                let percentToUse = useOldData ? (eurMonitor.percentOld ?? 0.0) : eurMonitor.percent
+                let lastUpdateToUse = useOldData ? (eurMonitor.lastUpdateOld ?? "N/A") : eurMonitor.lastUpdate
+                
+                // Asignamos los valores a la UI
+                tasaEuro = String(format: "%.2f", priceToUse)
+                porcentajeParalelo = String(format: "%.2f", percentToUse)
+                simboloParalelo = eurMonitor.symbol
+                fechaActualizacionParalelo = lastUpdateToUse
+                
+                // Guardamos los valores para el caché
+                tasaEuroCache = priceToUse
+                porcentajeParaleloCache = String(format: "%.2f", percentToUse)
+                simboloParaleloCache = eurMonitor.symbol
+                fechaEuroCache = lastUpdateToUse
+                
+                print(useOldData ? "✅ Datos EUR (OLD) procesados." : "✅ Datos EUR (Current) procesados.")
+            } else {
+                print("⚠️ No se encontró el monitor 'eur' en la respuesta.")
+            }
+            
+            calcularDiferencia()
+            
+            let dataToCache = DollarDataCache(
+                tasaBCV: tasaBCVCache,
+                tasaEuro: tasaEuroCache,
+                porcentajeBcv: porcentajeBcvCache,
+                porcentajeParalelo: porcentajeParaleloCache,
+                simboloBcv: simboloBcvCache,
+                simboloParalelo: simboloParaleloCache,
+                fechaActualizacionBCV: fechaBcvCache,
+                fechaActualizacionParalelo: fechaEuroCache,
+                timestamp: Date()
+            )
+            CacheManager.shared.save(data: dataToCache)
+            print("Nuevos datos de la API guardados en caché.")
+            
+            if isOffline {
+                isOffline = false
+                showStatusMessage("¡Conexión restablecida!")
+            }
+            
+            await MainActor.run {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                    animateDateUpdate = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        animateDateUpdate = false
+                    }
+                }
+            }
+            
+        } catch {
+            print("❌ ERROR en llamarApiDolar: \(error)")
+            print("❌ Descripción localizada del error: \(error.localizedDescription)")
+            isOffline = true
+            showStatusMessage("No se pudo actualizar. Verifique su conexión.")
+            HapticManager.shared.play(.error)
+            print("Error al obtener las tasas de dólar desde la API: \(error). Se mantendrán los datos cacheados.")
+        }
+    }
+    
+    func showStatusMessage(_ message: String) {
+       // ... (sin cambios en esta función)
+       Task { @MainActor in
+           self.statusMessage = message
+           try? await Task.sleep(nanoseconds: 3_000_000_000)
+           self.statusMessage = nil
+       }
+   }
+    
     func calcularDiferencia() {
+        // ... (sin cambios en esta función)
         mensaje = "Diferencia Cambiaria"
-        diferenciaBs = (Double(tasaEuro) ?? 1.0) * (Double(dolares) ?? 1.0) - (Double(tasaBCV) ?? 1.0) * (Double(dolares) ?? 1.0)
-        diferenciaDolares = ((Double(tasaEuro) ?? 1.0) * (Double(dolares) ?? 1.0) - (Double(tasaBCV) ?? 1.0) * (Double(dolares) ?? 1.0)) / (Double(tasaBCV) ?? 1.0)
-        let diferenciadolares = (Double(tasaEuro) ?? 1.0) - (Double(tasaBCV) ?? 1.0)
-        diferenciaPorcentual =  (diferenciadolares / (Double(tasaBCV) ?? 1.0)) * 100
+        let tasaEuroDouble = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0.0
+        let tasaBCVDouble = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0.0
+        let dolaresDouble = Double(normalizaNumero(dolares)) ?? 0.0
+        
+        if tasaBCVDouble > 0 && dolaresDouble > 0 {
+            diferenciaBs = (tasaEuroDouble * dolaresDouble) - (tasaBCVDouble * dolaresDouble)
+            diferenciaDolares = diferenciaBs / tasaBCVDouble
+            let diferenciaDeTasas = tasaEuroDouble - tasaBCVDouble
+            diferenciaPorcentual = (diferenciaDeTasas / tasaBCVDouble) * 100
+        } else {
+            diferenciaBs = 0
+            diferenciaDolares = 0
+            diferenciaPorcentual = 0
+        }
     }
 }
 
@@ -497,8 +523,6 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
-
 //struct DolarAlDiaView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        DolarAlDiaView()
