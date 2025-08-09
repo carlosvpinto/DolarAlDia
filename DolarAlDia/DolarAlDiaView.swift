@@ -278,7 +278,7 @@ struct DolarAlDiaView: View {
             self.simboloParalelo = cachedData.simboloParalelo
             self.fechaActualizacionBCV = cachedData.fechaActualizacionBCV
             self.fechaActualizacionParalelo = cachedData.fechaActualizacionParalelo
-            print("Datos cargados desde el caché.")
+           
         } else {
             print("No se encontraron datos en el caché.")
         }
@@ -377,7 +377,7 @@ struct DolarAlDiaView: View {
 
     func llamarApiDolar() async {
         do {
-            print("🚀 Iniciando llamada a la API de Dólar...")
+     
             let apiService = ApiNetworkDolarAlDia()
             let dollarData = try await apiService.getDollarRates()
             
@@ -416,7 +416,7 @@ struct DolarAlDiaView: View {
                 simboloBcvCache = usdMonitor.symbol
                 fechaBcvCache = lastUpdateToUse
                 
-                print(useOldData ? "✅ Datos USD (OLD) procesados." : "✅ Datos USD (Current) procesados.")
+               
             } else {
                 print("⚠️ No se encontró el monitor 'usd' en la respuesta.")
             }
@@ -442,7 +442,7 @@ struct DolarAlDiaView: View {
                 simboloParaleloCache = eurMonitor.symbol
                 fechaEuroCache = lastUpdateToUse
                 
-                print(useOldData ? "✅ Datos EUR (OLD) procesados." : "✅ Datos EUR (Current) procesados.")
+               
             } else {
                 print("⚠️ No se encontró el monitor 'eur' en la respuesta.")
             }
@@ -461,7 +461,7 @@ struct DolarAlDiaView: View {
                 timestamp: Date()
             )
             CacheManager.shared.save(data: dataToCache)
-            print("Nuevos datos de la API guardados en caché.")
+          
             
             if isOffline {
                 isOffline = false
@@ -480,12 +480,11 @@ struct DolarAlDiaView: View {
             }
             
         } catch {
-            print("❌ ERROR en llamarApiDolar: \(error)")
-            print("❌ Descripción localizada del error: \(error.localizedDescription)")
+          
             isOffline = true
             showStatusMessage("No se pudo actualizar. Verifique su conexión.")
             HapticManager.shared.play(.error)
-            print("Error al obtener las tasas de dólar desde la API: \(error). Se mantendrán los datos cacheados.")
+           
         }
     }
     

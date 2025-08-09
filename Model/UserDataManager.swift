@@ -33,7 +33,7 @@ class UserDataManager {
         if let defaultUser = loadDefaultUser(), defaultUser.id == id {
             // Si es el predeterminado, lo eliminamos de UserDefaults.
             UserDefaults.standard.removeObject(forKey: defaultUserKey)
-            print("Usuario predeterminado eliminado.")
+         
         }
         
         // 3. Eliminar el usuario de la lista principal
@@ -46,7 +46,7 @@ class UserDataManager {
         // y todavía hay usuarios en la lista, establecer el primero como nuevo default.
         if loadDefaultUser() == nil, let newDefault = users.first {
             saveDefaultUser(newDefault)
-            print("Se ha establecido un nuevo usuario predeterminado.")
+            
         }
     }
 

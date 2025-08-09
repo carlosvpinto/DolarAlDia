@@ -27,7 +27,7 @@ class UserSession: ObservableObject {
         let tieneUsuario = userDataManager.loadDefaultUser() != nil
         if tieneUsuario != hayUsuarioGuardado {
             hayUsuarioGuardado = tieneUsuario
-            print("Estado del usuario actualizado: \(hayUsuarioGuardado)")
+            
         }
     }
 }

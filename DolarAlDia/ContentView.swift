@@ -147,7 +147,7 @@ struct ContentView: View {
                 .compactMap({ $0 as? UIWindowScene })
                 .first?.windows
                 .first(where: { $0.isKeyWindow })?.rootViewController else {
-            print("No se pudo obtener el rootViewController.")
+        
             return
         }
         

@@ -47,7 +47,7 @@ struct CacheManager {
             let decodedData = try JSONDecoder().decode(DollarDataCache.self, from: savedData)
             return decodedData
         } catch {
-            print("Error al cargar los datos de caché: \(error)")
+           
             return nil
         }
     }
