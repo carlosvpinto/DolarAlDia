@@ -103,6 +103,8 @@ struct ContentView: View {
                       
                      
                   }
+    
+    
     // ----- FUNCIONES AUXILIARES -----
     
    
@@ -118,37 +120,28 @@ struct ContentView: View {
     
     func compartirCapturaConTextoYImagen(compartirImagenDePago: Bool) {
 
-        // --- Parte 1: Decidir qué contenido compartir (Tu lógica actual, sin cambios) ---
         
         var imagenParaCompartir: UIImage?
 
-        // 1. Prioridad 1: Imagen personalizada si el usuario la quiere.
         if compartirImagenDePago {
             imagenParaCompartir = obtenerImagenUsuarioPredeterminado()
         }
 
-        // 2. Prioridad 2: Captura de pantalla condicional.
-        // Solo si no se usó la imagen personalizada y si estamos en la vista correcta.
         if imagenParaCompartir == nil {
             if selectedSection == Constants.DOLARALDIA {
                 imagenParaCompartir = tomarCapturaDePantalla()
             }
         }
         
-        // 3. Preparamos el array de ítems. Siempre incluimos el texto.
         var itemsParaCompartir: [Any] = [self.compartirTexto]
         
-        // Si después de la lógica anterior conseguimos una imagen, la añadimos.
         if let imagenFinal = imagenParaCompartir {
             itemsParaCompartir.insert(imagenFinal, at: 0)
         }
 
-        // --- Parte 2: Presentar la hoja de compartir (Con la corrección para iPad) ---
-        
-        // 4. Creamos el controlador de la actividad.
+
         let activityViewController = UIActivityViewController(activityItems: itemsParaCompartir, applicationActivities: nil)
         
-        // 5. Obtenemos el controlador de la vista raíz.
         guard let rootViewController = UIApplication.shared.connectedScenes
                 .filter({ $0.activationState == .foregroundActive })
                 .compactMap({ $0 as? UIWindowScene })
