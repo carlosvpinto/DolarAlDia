@@ -13,6 +13,11 @@ struct BotonInfoPrecio: View {
     var simboloFlecha: String
     var variacionPorcentaje: String
     var isSelected: Bool
+    
+    // --- NUEVO ---
+    // Añadimos esta propiedad para saber la dirección de la animación
+    var mostrarTasasFuturas: Bool
+    
     var action: () -> Void
     @Environment(\.colorScheme) var colorScheme
     
@@ -23,35 +28,40 @@ struct BotonInfoPrecio: View {
                 .font(.title3)
             
             Button(action: {
-                action() // Ejecutar la acción al presionar el botón
+                action()
             }, label: {
-                Text("Bs  \(valorDolar)")
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .bold()
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .background(isSelected ? Color.blue : Color.gray)
-                    .cornerRadius(20)
-                    .scaleEffect(isSelected ? 0.95 : 1) // Efecto de presionado
+                HStack(spacing: 4) { // Usamos un HStack para combinar el "Bs" y el valor
+                    Text("Bs")
+                    Text(valorDolar)
+                        // --- ANIMACIÓN APLICADA AQUÍ ---
+                        .contentTransition(.numericText(countsDown: !mostrarTasasFuturas))
+                }
+                .frame(maxWidth: .infinity, maxHeight: 50)
+                .bold()
+                .font(.title2)
+                .foregroundColor(.white)
             })
+            .background(isSelected ? Color.blue : Color.gray)
+            .cornerRadius(20)
+            .scaleEffect(isSelected ? 0.95 : 1)
             
-            // Verificación para mostrar solo si el simboloFlecha no está vacío
-            if mostrar{
+            if mostrar {
                 HStack(spacing: 5) {
-                    // Cambia el color del símbolo según sea ▲ o ▼
                     Text(simboloFlecha)
                         .foregroundColor(simboloFlecha == "▲" ? .green : .red)
                     
                     Text("\(variacionPorcentaje)%")
                         .font(.caption)
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
+                        // --- ANIMACIÓN APLICADA AQUÍ ---
+                        .contentTransition(.numericText(countsDown: !mostrarTasasFuturas))
                 }
             }
         }
     }
 }
 
-
+// --- MODIFICADO ---
 #Preview {
     BotonInfoPrecio(
         mostrar: true,
@@ -60,6 +70,7 @@ struct BotonInfoPrecio: View {
         simboloFlecha: "▲",
         variacionPorcentaje: "0.5",
         isSelected: true,
+        mostrarTasasFuturas: false, // Valor para la preview
         action: {
             print("Botón presionado")
         }
