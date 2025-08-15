@@ -4,7 +4,6 @@
 //
 //  Created by Carlos Vicente Pinto on 12/8/24.
 //
-
 import SwiftUI
 
 struct MenuView: View {
@@ -34,7 +33,10 @@ struct MenuView: View {
                             .padding(.horizontal)
 
                         menuOption(label: "Inicio", systemImage: "house", section: Constants.DOLARALDIA)
-                      // menuOption(label: "Precio en Paginas", systemImage: "network", section: Constants.PRECIOPAGINAS) para que no aparezca
+                        
+                        // --- NUEVA OPCIÓN AÑADIDA AQUÍ ---
+                        menuOption(label: "Plataformas", systemImage: "chart.bar.xaxis", section: Constants.PLATAFORMAS)
+                        
                         menuOption(label: "Precio en Oficial", systemImage: "dollarsign.bank.building", section: Constants.PRECIOBCV)
 
                         // Submenú Historia
@@ -53,7 +55,7 @@ struct MenuView: View {
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(
-                                    (selectedSection == "HISTORIA_BCV" || selectedSection == "HISTORIA_PARALELO") ?
+                                    (selectedSection == Constants.HISTORIA_BCV) ?
                                     (colorScheme == .dark ? Color.gray.opacity(0.3) : Color.blue.opacity(0.2)) : Color.clear
                                 )
                                 .cornerRadius(10)

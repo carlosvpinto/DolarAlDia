@@ -9,6 +9,8 @@ import SwiftUI
 
 // Asegúrate de que tus constantes estén definidas en algún lugar accesible.
 // Estas nos ayudan a evitar errores de tipeo.
+import SwiftUI
+
 struct MainTabView: View {
     // Recibe la sección seleccionada como un Binding para comunicarse con ContentView
     @Binding var selectedSection: String
@@ -26,7 +28,6 @@ struct MainTabView: View {
         TabView(selection: $selectedSection) {
             
             // Pestaña 1: Inicio
-            // **** LA VISTA SE COLOCA AQUÍ ****
             DolarAlDiaView(
                 dolares: $dolares,
                 bolivares: $bolivares,
@@ -34,21 +35,26 @@ struct MainTabView: View {
                 tasaEuro: $tasaEuro,
                 selectedButton: $selectedButton
             )
-            .tabItem { // Esto define el botón de la barra
+            .tabItem {
                 Label("Inicio", systemImage: "house")
             }
-            .tag(Constants.DOLARALDIA) // Este tag debe coincidir con el estado
-
-            // Pestaña 2: Precio Oficial
-            // **** LA VISTA SE COLOCA AQUÍ ****
+            .tag(Constants.DOLARALDIA)
+            
+            // Volvemos a usar un 'systemImage' simple y robusto.
+            PlatformRatesView()
+                .tabItem {
+                    Label("Plataformas", systemImage: "globe.americas.fill")
+                }
+                .tag(Constants.PLATAFORMAS)
+            
+            // Pestaña 3: Bancos
             MonitorBcvListView()
                 .tabItem {
                     Label("Bancos", systemImage: "dollarsign.circle")
                 }
                 .tag(Constants.PRECIOBCV)
 
-            // Pestaña 3: Historia BCV
-            // **** LA VISTA SE COLOCA AQUÍ ****
+            // Pestaña 4: Historia BCV
             BCVHistoryView(
                 imgUrl: "https://res.cloudinary.com/dcpyfqx87/image/upload/v1729921478/monitors/public_id:bcv.webp",
                 navigationTitle: "Historia Dólar BCV",
@@ -60,8 +66,7 @@ struct MainTabView: View {
             }
             .tag(Constants.HISTORIA_BCV)
             
-            // Pestaña 4: Pago Móvil
-            // **** LA VISTA SE COLOCA AQUÍ ****
+            // Pestaña 5: Pago Móvil
             UserListView()
                 .tabItem {
                     Label("Pago Móvil", systemImage: "list.bullet.rectangle")
@@ -71,9 +76,3 @@ struct MainTabView: View {
         .accentColor(.blue) // Color del ícono y texto activo
     }
 }
-// Vista previa para el lienzo de Xcode
-//struct MainTabView_Previews: PreviewProvider {
-//    static var previews: some View {
- //       MainTabView()
-  //  }
-//}

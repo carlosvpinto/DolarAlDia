@@ -51,4 +51,35 @@ struct CacheManager {
             return nil
         }
     }
+    
+    // --- NUEVAS FUNCIONES PARA PLATFORM DATA CACHE ---
+      private let platformCacheKey = "platformDataCache"
+
+      // Función para guardar los datos de las plataformas
+      func savePlatforms(data: PlatformDataCache) {
+          do {
+              let encodedData = try JSONEncoder().encode(data)
+              UserDefaults.standard.set(encodedData, forKey: platformCacheKey)
+              print("✅ Datos de plataformas guardados en caché.")
+          } catch {
+              print("❌ Error al guardar datos de plataformas en caché: \(error)")
+          }
+      }
+
+      // Función para cargar los datos de las plataformas
+      func loadPlatforms() -> PlatformDataCache? {
+          guard let savedData = UserDefaults.standard.data(forKey: platformCacheKey) else {
+              return nil
+          }
+          
+          do {
+              let decodedData = try JSONDecoder().decode(PlatformDataCache.self, from: savedData)
+              // Opcional: Podrías añadir una lógica para invalidar el caché si es muy antiguo
+              return decodedData
+          } catch {
+              print("❌ Error al cargar datos de plataformas desde el caché: \(error)")
+              return nil
+          }
+      }
+    
 }

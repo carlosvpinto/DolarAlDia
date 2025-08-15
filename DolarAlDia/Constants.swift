@@ -11,6 +11,7 @@ import Foundation
 struct Constants {
     static let HISTORIA_BCV = "HISTORIA_BCV"
     static let HISTORIA_PARALELO = "HISTORIA_PARALELO"
+    static let PLATAFORMAS = "PLATAFORMAS"
 
     
     static let DOLARBCV = "Dolar BCV"

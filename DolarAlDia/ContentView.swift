@@ -151,30 +151,25 @@ struct ContentView: View {
             return
         }
         
-        // MARK: - AQUÍ ESTÁ LA SOLUCIÓN PARA EL CRASH EN IPAD
-        // Antes de presentar, configuramos el popover si estamos en un iPad.
+      
         if let popoverController = activityViewController.popoverPresentationController {
             // Le damos al popover un "ancla" visual. Le decimos que se origine
             // desde la vista principal de la pantalla.
             popoverController.sourceView = rootViewController.view
-            
-            // Especificamos que el popover debe aparecer en el centro de la pantalla.
-            // Esto es robusto y evita buscar un botón específico.
+       
             popoverController.sourceRect = CGRect(x: rootViewController.view.bounds.midX,
                                                   y: rootViewController.view.bounds.midY,
                                                   width: 0,
                                                   height: 0)
-            
-            // Ocultamos la flecha del popover, ya que no apunta a nada.
+           
             popoverController.permittedArrowDirections = []
         }
         
-        // 6. Presentamos la hoja de compartir. Ahora funcionará en iPhone y iPad.
         rootViewController.present(activityViewController, animated: true, completion: nil)
     }
     
     func tomarCapturaDePantalla(escala: CGFloat = 0.8) -> UIImage? {
-        // 1. Obtenemos la ventana principal de la aplicación (sin cambios).
+      
         guard let ventana = UIApplication.shared.connectedScenes
                 .filter({ $0.activationState == .foregroundActive })
                 .compactMap({ $0 as? UIWindowScene })
@@ -183,20 +178,18 @@ struct ContentView: View {
             return nil
         }
 
-        // 2. Calculamos el nuevo tamaño basado en el factor de escala.
         let tamanoOriginal = ventana.bounds.size
         let nuevoTamano = CGSize(
             width: tamanoOriginal.width * escala,
             height: tamanoOriginal.height * escala
         )
 
-        // En lugar de usar `ventana.bounds.size`, usamos `nuevoTamano`.
+
         let renderer = UIGraphicsImageRenderer(size: nuevoTamano)
 
-        // 4. Dibujamos la jerarquía de la vista en el nuevo lienzo más pequeño.
-        // Esto efectivamente redimensiona la imagen durante la creación.
+
         let imagen = renderer.image { ctx in
-            // El rectángulo de dibujo ahora coincide con el nuevo tamaño del lienzo.
+      
             ventana.drawHierarchy(in: CGRect(origin: .zero, size: nuevoTamano), afterScreenUpdates: true)
         }
         

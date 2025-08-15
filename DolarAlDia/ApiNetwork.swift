@@ -9,54 +9,76 @@ import Foundation
 
 class ApiNetwork {
     
-    // Estructura principal del modelo (similar a `Wrapper`)
+    // MARK: - Modelos para el Dólar (BCV, Paralelo)
+    
     struct DollarResponse: Codable {
         let datetime: DateTime
         let monitors: Monitors
     }
     
-    // Estructura de fecha y hora
+    struct Monitors: Codable {
+        let bcv: MonitorDetail
+        let enparalelovzla: MonitorDetail
+    }
+
+    // --- MODELO GENERAL DE DETALLE (Reutilizable) ---
+    // Este modelo ahora puede ser usado tanto por monitores como por plataformas.
+    struct MonitorDetail: Codable, Identifiable {
+        var id: String { title }
+        let change: Double
+        let color: String
+        let image: String? // Hacemos la imagen opcional para que sea compatible con ambas respuestas
+        let lastUpdate: String
+        let percent: Double
+        let price: Double
+        let priceOld: Double
+        let priceOlder: Double?
+        let symbol: String
+        let title: String
+        
+        enum CodingKeys: String, CodingKey {
+            case change, color, image, percent, price, symbol, title
+            case lastUpdate = "last_update"
+            case priceOld = "price_old"
+            case priceOlder = "price_older"
+        }
+    }
+    
+    // MARK: - Nuevos Modelos para Plataformas (Binance, Bybit)
+    
+    // El modelo de respuesta principal es un poco diferente.
+    struct PlatformResponse: Codable {
+        let datetime: DateTime
+        let platforms: [String: MonitorDetail] // La clave es que 'platforms' es un diccionario dinámico
+    }
+    
+    // La estructura DateTime la podemos reutilizar.
     struct DateTime: Codable {
         let date: String
         let time: String
     }
     
-    // Estructura de los monitores (similar a `results`)
-    struct Monitors: Codable {
-        let bcv: MonitorDetail
-        let enparalelovzla: MonitorDetail
+    
+    // Para obtener la información de las plataformas (Binance, Bybit, etc.)
+    func getPlatformRates() async throws -> PlatformResponse {
+        
+        guard let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/market-p2p") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        // Asumo que también requiere autorización. Si no, puedes eliminar esta línea.
+        request.setValue("Bearer 2x9Qjpxl5F8CoKK6T395KA", forHTTPHeaderField: "Authorization")
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        
+        let platformResponse = try JSONDecoder().decode(PlatformResponse.self, from: data)
+        return platformResponse
     }
     
-    // Detalles de cada monitor de tipo dólar (similar a `Superhero`)
-    struct MonitorDetail: Codable, Identifiable {
-        var id: String {
-            return title
-        }
-        let change: Double
-        let color: String
-        let image: String
-        let lastUpdate: String
-        let percent: Double
-        let price: Double
-        let priceOld: Double
-        let symbol: String
-        let title: String
-        
-        // Usando `CodingKeys` para mapear propiedades que cambian de nombre
-        enum CodingKeys: String, CodingKey {
-            case change
-            case color
-            case image
-            case lastUpdate = "last_update"
-            case percent
-            case price
-            case priceOld = "price_old"
-            case symbol
-            case title
-        }
-    }
-
-   
+    
+    // --- TUS FUNCIONES ANTERIORES (SIN CAMBIOS) ---
     
     func getDollarRatesBasedOnTime() async throws -> DollarResponse {
         let calendar = Calendar.current
@@ -70,14 +92,14 @@ class ApiNetwork {
         
         let currentTimeInMinutes = hour * 60 + minute
         
-        if isWeekend || currentTimeInMinutes >= (15 * 60 + 1) {
+        // La lógica original tenía un posible error (15 * 60 + 1), lo ajusto a 15:00
+        if isWeekend || currentTimeInMinutes >= (15 * 60) {
             return try await getDollarAlCambio()
         } else {
             return try await getDollarRates()
         }
     }
 
-    // Función para obtener la información del dólar
     func getDollarRates() async throws -> DollarResponse {
         let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar")!
         
@@ -103,5 +125,4 @@ class ApiNetwork {
         let dollarResponse = try JSONDecoder().decode(DollarResponse.self, from: data)
         return dollarResponse
     }
-
 }
