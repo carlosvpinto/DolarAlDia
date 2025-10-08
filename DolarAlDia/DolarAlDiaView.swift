@@ -8,14 +8,13 @@ enum CampoDeEnfoque: Hashable {
 }
 
 struct DolarAlDiaView: View {
-    // --- ESTADOS Y BINDINGS (Sin cambios) ---
     @Binding var dolares: String
     @Binding var bolivares: String
     @Binding var tasaBCV: String
     @Binding var tasaEuro: String
     @Binding var selectedButton: String
     
-    // ... otros estados ...
+
     @State private var porcentajeParalelo: String = ""
     @State private var porcentajeBcv: String = ""
     @State private var simboloBcv: String = ""
@@ -44,6 +43,8 @@ struct DolarAlDiaView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
+
+    
     var placeholderMoneda: String {
         selectedButton == Constants.DOLARBCV ? "Dólares" : "Euro"
     }
@@ -60,6 +61,8 @@ struct DolarAlDiaView: View {
             }
             .padding()
             .onAppear {
+                
+                
                 Task {
                     await cargarDatosCacheados()
                     isLoading = true
@@ -89,8 +92,7 @@ struct DolarAlDiaView: View {
            campoEnfocado = nil
        }
     }
-    
-    // --- VISTAS EXTRAÍDAS (LA SOLUCIÓN AL ERROR) ---
+
     
     // 1. Vista para el contenido principal
     private var mainContentView: some View {
@@ -136,7 +138,10 @@ struct DolarAlDiaView: View {
                             }
                         }
                     }
-                    Button(action:{ calcularDiferencia(); showSheet = true }){
+                    Button(action: {
+                        calcularDiferencia()
+                        showSheet = true
+                    }){
                         Image(systemName: "mail.and.text.magnifyingglass").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
                     }
                 }
@@ -314,12 +319,7 @@ struct DolarAlDiaView: View {
         }
     }
 
-    // YA NO NECESITAS LA FUNCIÓN normalizaNumero. Puedes eliminarla.
-    /*
-    func normalizaNumero(_ valor: String) -> String {
-        ...
-    }
-    */
+  
 
     func convertirBolivaresADolares() {
         // Formateador para MOSTRAR el resultado en el formato deseado (ej: 1.234,56)
@@ -479,18 +479,7 @@ struct DolarAlDiaView: View {
                 datosActuales.simboloParalelo = eurMonitor.symbol
             }
             
-            // --- BLOQUE DE PRUEBA TEMPORAL ---
-            // Descomenta este bloque para FORZAR la aparición del Switch y probar las animaciones.
-            /*
-            print("⚠️ MODO DE PRUEBA DE DATOS FUTUROS ACTIVADO")
-            hayDataFuturaTemporal = true // Forzamos a que el Switch aparezca
-            // Le damos datos falsos para ver el cambio
-            datosFuturos.tasaBCV = "45.50"
-            datosFuturos.tasaEuro = "50.20"
-            datosFuturos.porcentajeBcv = "1.25"
-            datosFuturos.porcentajeParalelo = "1.30"
-            datosFuturos.fechaBCV = "12/08/2025, 09:00 AM" // Una fecha futura de ejemplo
-            */
+        
             
             // Guardamos el caché con los datos ACTUALES (sin importar la prueba)
             let dataToCache = DollarDataCache(
@@ -505,7 +494,7 @@ struct DolarAlDiaView: View {
                 timestamp: Date()
             )
             CacheManager.shared.save(data: dataToCache)
-            print("✅ Caché guardado con los datos ACTUALES correctos.")
+          
 
             // Actualizamos las variables de estado para la UI
             self.hayDatosFuturos = hayDataFuturaTemporal

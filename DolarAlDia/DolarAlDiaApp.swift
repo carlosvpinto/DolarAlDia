@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import GoogleMobileAds
 import Firebase
 import FirebaseMessaging
 
@@ -21,6 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     FirebaseApp.configure()
       requestAuthorizationForPushNotification(application: application)
+      //ReviewManager.shared.trackSession()
 
     return true
 
@@ -47,12 +48,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
        }
     //********************************************************
 }
-
-
+import SwiftUI
+import GoogleMobileAds
 @main
+
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+    init() {
+        MobileAds.shared.start(completionHandler: nil)
+       }
     @StateObject private var userSession = UserSession()
     var body: some Scene {
         WindowGroup {

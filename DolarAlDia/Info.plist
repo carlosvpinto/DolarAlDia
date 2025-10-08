@@ -4,5 +4,7 @@
 <dict>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3265312813580307~7177373128</string>
 </dict>
 </plist>

@@ -5,7 +5,7 @@
 //  Created by Carlos Vicente Pinto on 12/1/24.
 //
 import SwiftUI
-
+import AppTrackingTransparency // <-- 1. IMPORTA EL FRAMEWORK para los permisos de uicacion
 extension UIApplication {
     func endEditing() {
         sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -31,10 +31,22 @@ struct ContentView: View {
     // MARK: - Usamos el UserSession compartido
     @EnvironmentObject var userSession: UserSession
     
+    // =================================================================
+    // PASO 1: AÑADIMOS LA INSTANCIA DEL COORDINADOR DE ANUNCIOS
+    // =================================================================
+    private let adCoordinator = InterstitialAdCoordinator.shared
+    
+   
+    
     private let userDataManager = UserDataManager()
+    
+    // Esta variable nos dirá en qué estado se encuentra la app.
+    @Environment(\.scenePhase) private var scenePhase
   
 
     var body: some View {
+        
+        
         NavigationView {
             // MainTabView ahora ocupa todo el cuerpo de la vista
             MainTabView(
@@ -100,6 +112,23 @@ struct ContentView: View {
                           }
                       }
                         .navigationViewStyle(.stack)
+        
+        // =================================================================
+        // PASO 2: AÑADIMOS EL MODIFICADOR .onAppear PARA EJECUTAR LA LÓGICA
+        // =================================================================
+                        .onChange(of: scenePhase) { oldPhase, newPhase in
+                            // Esta condición se cumplirá cuando la app pase a primer plano.
+                            // Es el momento perfecto y seguro para ejecutar nuestra lógica.
+                            if newPhase == .active {
+                                // activar cuandi quiera subir anuncios
+                                //showLaunchAd()
+                                
+                                //Funcion para pedir los permisos
+                                requestTrackingPermission()
+                                // Lógica de la reseña
+                                ReviewManager.shared.trackSession()
+                            }
+                        }
                       
                      
                   }
@@ -107,6 +136,44 @@ struct ContentView: View {
     
     // ----- FUNCIONES AUXILIARES -----
     
+    private func requestTrackingPermission() {
+           // Envolvemos en un DispatchQueue para darle tiempo a la app de estabilizarse
+           DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+               ATTrackingManager.requestTrackingAuthorization { status in
+                   switch status {
+                   case .authorized:
+                       // El usuario aceptó. AdMob usará el IDFA.
+                       print("ATT: Permiso de seguimiento autorizado.")
+                   case .denied:
+                       // El usuario denegó. AdMob no usará el IDFA.
+                       print("ATT: Permiso de seguimiento denegado.")
+                   case .notDetermined:
+                       // El sistema aún no ha presentado el diálogo.
+                       print("ATT: Permiso de seguimiento no determinado.")
+                   case .restricted:
+                       // El usuario no puede cambiar esta configuración (ej: control parental).
+                       print("ATT: Permiso de seguimiento restringido.")
+                   @unknown default:
+                       print("ATT: Estado de seguimiento desconocido.")
+                   }
+               }
+           }
+       }
+    
+    // =================================================================
+       // PASO 3: AÑADIMOS LA FUNCIÓN QUE CONTROLA EL ANUNCIO
+       // =================================================================
+    // ESTA ES LA FUNCIÓN CORREGIDA
+       private func showLaunchAd() {
+           print("La app se ha iniciado. Intentando mostrar un anuncio.")
+           
+           // ¡SIN CONDICIONES! Simplemente cargamos y mostramos el anuncio.
+           // Esto se ejecutará cada vez que la app se inicie.
+           adCoordinator.loadAd {
+               print("Anuncio cargado, mostrando ahora.")
+               adCoordinator.showAd()
+           }
+       }
    
     private func titleForSection(_ section: String) -> String {
         switch section {

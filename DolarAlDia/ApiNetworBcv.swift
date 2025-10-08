@@ -103,7 +103,7 @@ class ApiNetworkBcv {
     // Función para obtener la información del dólar
     func getDollarRatesBcv() async throws -> DollarResponseBcv {
         // Cambiar la URL a la nueva con el parámetro "bcv"
-        let url = URL(string: "https://pydolarve.org/api/v1/dollar?page=bcv")!
+        let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar?page=bcv")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

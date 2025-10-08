@@ -25,7 +25,7 @@ class BCVHistoryService: ObservableObject {
         let endDate = formatter.string(from: today)
         let startDate = formatter.string(from: thirtyDaysAgo)
 
-        let urlString = "https://pydolarve.org/api/v2/dollar/history?page=\(page)&monitor=\(monitor)&start_date=\(startDate)&end_date=\(endDate)&format_date=default&rounded_price=true&order=desc"
+        let urlString = "https://api.dolaraldiavzla.com/api/v2/dollar/history?page=\(page)&monitor=\(monitor)&start_date=\(startDate)&end_date=\(endDate)&format_date=default&rounded_price=true&order=desc"
         guard let url = URL(string: urlString) else { return }
 
         var request = URLRequest(url: url)

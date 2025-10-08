@@ -79,7 +79,7 @@ class ApiNetworkCripto {
     // Función para obtener la información del dólar
     func getDollarRatesCripto() async throws -> DollarResponse {
         // Cambiar la URL a la nueva con el parámetro "criptodolar"
-        let url = URL(string: "https://pydolarve.org/api/v1/dollar?page=criptodolar")!
+        let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar?page=criptodolar")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

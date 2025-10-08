@@ -78,8 +78,6 @@ class ApiNetwork {
     }
     
     
-    // --- TUS FUNCIONES ANTERIORES (SIN CAMBIOS) ---
-    
     func getDollarRatesBasedOnTime() async throws -> DollarResponse {
         let calendar = Calendar.current
         let now = Date()
@@ -92,7 +90,7 @@ class ApiNetwork {
         
         let currentTimeInMinutes = hour * 60 + minute
         
-        // La lógica original tenía un posible error (15 * 60 + 1), lo ajusto a 15:00
+    
         if isWeekend || currentTimeInMinutes >= (15 * 60) {
             return try await getDollarAlCambio()
         } else {
@@ -114,7 +112,7 @@ class ApiNetwork {
     }
 
     func getDollarAlCambio() async throws -> DollarResponse {
-        let url = URL(string: "https://pydolarve.org/api/v1/dollar?page=alcambio&format_date=default&rounded_price=true")!
+        let url = URL(string: "https://api.dolaraldiavzla.com/api/v1/dollar?page=alcambio&format_date=default&rounded_price=true")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
