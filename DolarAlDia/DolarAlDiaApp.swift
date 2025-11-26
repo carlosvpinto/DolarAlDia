@@ -18,8 +18,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
   func application(_ application: UIApplication,
 
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+      
+    
+          // --- FIN DEL CÓDIGO DE DIAGNÓSTICO ---
 
-    FirebaseApp.configure()
+      //Configuracion Firebase
+      FirebaseApp.configure()
+    //  MobileAds.shared.start(completionHandler: nil)
+      RemoteConfigManager.shared.fetchConfig()
       requestAuthorizationForPushNotification(application: application)
       //ReviewManager.shared.trackSession()
 
@@ -55,15 +61,20 @@ import GoogleMobileAds
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     init() {
-        MobileAds.shared.start(completionHandler: nil)
+      //  MobileAds.shared.start(completionHandler: nil)
        }
     @StateObject private var userSession = UserSession()
+    
+    // 👇 AÑADIDO: Crea una única instancia del gestor de estado.
+       @StateObject private var adState = AdState()
     var body: some Scene {
         WindowGroup {
           //  MenuView()
           //  DolarAlDiaView()
             ContentView()
                 .environmentObject(userSession)
+            // 👇 Inyecta el gestor de estado en el entorno de la app.
+                .environmentObject(adState)
         }
     }
 }

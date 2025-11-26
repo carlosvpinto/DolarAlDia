@@ -11,7 +11,7 @@ class DolarAlDiaData: ObservableObject {
     @Published var bolivares: String = ""
     @Published var tasaBCV: String = ""
     @Published var tasaParalelo: String = ""
-    @Published var porcentajeParalelo: String = ""
+    @Published var porcentajeEuro: String = ""
     @Published var porcentajeBcv: String = ""
     @Published var simboloBcv: String = ""
     @Published var simboloParalelo: String = ""

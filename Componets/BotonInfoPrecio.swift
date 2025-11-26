@@ -14,53 +14,56 @@ struct BotonInfoPrecio: View {
     var variacionPorcentaje: String
     var isSelected: Bool
     
-    // --- NUEVO ---
-    // Añadimos esta propiedad para saber la dirección de la animación
+    // Propiedad para la dirección de la animación
     var mostrarTasasFuturas: Bool
     
     var action: () -> Void
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        VStack(spacing: 5) {
+       
+        VStack(spacing: 2) {
             Text(nombreDolar)
                 .bold()
-                .font(.title3)
+               
+                .font(.headline)
             
             Button(action: {
                 action()
             }, label: {
-                HStack(spacing: 4) { // Usamos un HStack para combinar el "Bs" y el valor
+             
+                HStack(spacing: 3) {
                     Text("Bs")
                     Text(valorDolar)
-                        // --- ANIMACIÓN APLICADA AQUÍ ---
                         .contentTransition(.numericText(countsDown: !mostrarTasasFuturas))
                 }
-                .frame(maxWidth: .infinity, maxHeight: 50)
+               
+                .frame(maxWidth: .infinity, maxHeight: 40)
                 .bold()
-                .font(.title2)
+           
+                .font(.title3)
                 .foregroundColor(.white)
             })
             .background(isSelected ? Color.blue : Color.gray)
-            .cornerRadius(20)
+     
+            .cornerRadius(15)
             .scaleEffect(isSelected ? 0.95 : 1)
             
             if mostrar {
-                HStack(spacing: 5) {
+              
+                HStack(spacing: 2) {
                     Text(simboloFlecha)
                         .foregroundColor(simboloFlecha == "▲" ? .green : .red)
                     
                     Text("\(variacionPorcentaje)%")
                         .font(.caption)
                         .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                        // --- ANIMACIÓN APLICADA AQUÍ ---
                         .contentTransition(.numericText(countsDown: !mostrarTasasFuturas))
                 }
             }
         }
     }
 }
-
 // --- MODIFICADO ---
 #Preview {
     BotonInfoPrecio(

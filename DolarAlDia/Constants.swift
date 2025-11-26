@@ -9,13 +9,25 @@ import Foundation
 // Constants.swift
 
 struct Constants {
+    //Id de Publicidades ADS*******************,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+   // static let adUnitIDBanner = "ca-app-pub-3940256099942544/2934735716" // Desarrollo
+   // static let adUnitIDInterstitial = "ca-app-pub-3940256099942544/4411468910" // Desarrollo
+   // static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313" //Desarrollo
+    
+    static let adUnitIDBanner = "ca-app-pub-3265312813580307/4069312956" // Produccion******
+    static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/2819810465" // Produccion
+    static let adUnitIDRewardedVideo = "ca-app-pub-3265312813580307/9272278997" //Produccion
+    
+    
     static let HISTORIA_BCV = "HISTORIA_BCV"
     static let HISTORIA_PARALELO = "HISTORIA_PARALELO"
     static let PLATAFORMAS = "PLATAFORMAS"
+    static let MAS_OPCIONES = "MAS_OPCIONES"
 
     
     static let DOLARBCV = "Dolar BCV"
     static let DOLARPARALELO = "Dolar Paralelo"
+    static let DOLARUSDT = "Tasa USDT"
     static let DOLAREUROBCV = "Euro BCV"
     static let DOLARPROMEDIO = "Dolar Promedio"
     static let defaultTimeout: TimeInterval = 30.0

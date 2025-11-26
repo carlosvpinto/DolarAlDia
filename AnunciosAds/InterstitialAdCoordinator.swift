@@ -24,10 +24,11 @@ class InterstitialAdCoordinator: NSObject, FullScreenContentDelegate {
             return
         }
 
-        let adUnitID = "ca-app-pub-3940256099942544/4411468910" // ID de prueba
+       // let adUnitID = "ca-app-pub-3940256099942544/4411468910" // ID de prueba
+        let adUnitIDInterstitial = Constants.adUnitIDInterstitial
         
         let request = Request()
-        InterstitialAd.load(with: adUnitID, request: request) { ad, error in
+        InterstitialAd.load(with: adUnitIDInterstitial, request: request) { ad, error in
             if let error = error {
                 print("Error al cargar el anuncio intersticial: \(error.localizedDescription)")
                 return

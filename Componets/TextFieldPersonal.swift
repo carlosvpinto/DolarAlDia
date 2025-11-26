@@ -54,7 +54,7 @@ struct TextFieldPersonal: View {
             )
             .animation(.easeInOut(duration: 0.2), value: isFocused) // Animación del borde
         }
-        .padding(.vertical)
+        .padding(8)
 
 
     }

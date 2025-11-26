@@ -13,6 +13,13 @@ extension UIApplication {
 }
 
 struct ContentView: View {
+    
+    // 1. AÑADIMOS EL COORDINADOR COMO UN OBJETO OBSERVADO
+       //    Esto conecta la vista con el coordinador. Ahora la vista se actualizará
+       //    automáticamente cuando la propiedad @Published 'isReady' cambie.
+       @ObservedObject private var rewardedAdCoordinator = RewardedAdCoordinator.shared
+   
+    
     // ----- ESTADO PRINCIPAL DE LA APLICACIÓN -----
     @State private var dolares: String = ""
     @State private var bolivares: String = ""
@@ -21,20 +28,27 @@ struct ContentView: View {
     @State private var selectedButton: String = Constants.DOLARBCV
     @State private var selectedSection: String = Constants.DOLARALDIA
     
-
+ 
     
     // Estado para los diálogos de compartir
     @State private var showingConfirmationDialog = false
     @State private var mostrarDialogoImagen = false
     @State private var compartirTexto: String = ""
     
+    // 👇 AÑADIDO: Nuevo estado para controlar la alerta del anuncio recompensado.
+    @State private var mostrarAlertaRecompensa = false
+    
     // MARK: - Usamos el UserSession compartido
     @EnvironmentObject var userSession: UserSession
+    
+    // 👇 AÑADIDO: Accede al gestor de estado de anuncios desde el entorno.
+    @EnvironmentObject var adState: AdState
     
     // =================================================================
     // PASO 1: AÑADIMOS LA INSTANCIA DEL COORDINADOR DE ANUNCIOS
     // =================================================================
     private let adCoordinator = InterstitialAdCoordinator.shared
+ 
     
    
     
@@ -46,92 +60,167 @@ struct ContentView: View {
 
     var body: some View {
         
-        
-        NavigationView {
-            // MainTabView ahora ocupa todo el cuerpo de la vista
-            MainTabView(
-                selectedSection: $selectedSection,
-                dolares: $dolares,
-                bolivares: $bolivares,
-                tasaBCV: $tasaBCV,
-                tasaEuro: $tasaEuroBcv,
-                selectedButton: $selectedButton
-            )
-            .navigationTitle(titleForSection(selectedSection))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                                  Button(action: {
-                                      // La lógica ahora es súper simple:
-                                      // Solo leemos la propiedad del UserSession, que SIEMPRE está actualizada.
-                                      if userSession.hayUsuarioGuardado {
-                                          showingConfirmationDialog = true
-                                      } else {
-                                          // Si no hay usuario, compartimos directamente sin preguntar.
-                                          compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: false)
-                                          compartirCapturaConTextoYImagen(compartirImagenDePago: false)
-                                      }
-                                  }) {
-                                      Image(systemName: "square.and.arrow.up")
-                                          .imageScale(.large)
-                                  }
-                    // El diálogo solo se mostrará cuando hay un usuario,
-                    .confirmationDialog(
-                        "¿Compartir datos de pago móvil?",
-                        isPresented: $showingConfirmationDialog,
-                        titleVisibility: .visible
-                    ) {
-                        Button("SI") {
-                            compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: true)
-                            mostrarDialogoImagen = true
+        ZStack(alignment: .bottomTrailing) {
+        VStack(spacing: 0) {
+            NavigationView {
+                // MainTabView ahora ocupa todo el cuerpo de la vista
+                MainTabView(
+                    selectedSection: $selectedSection,
+                    dolares: $dolares,
+                    bolivares: $bolivares,
+                    tasaBCV: $tasaBCV,
+                    tasaEuro: $tasaEuroBcv,
+                    selectedButton: $selectedButton
+                )
+                .navigationTitle(titleForSection(selectedSection))
+                .navigationBarTitleDisplayMode(.inline)
+                
+                .toolbar {
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            // La lógica ahora es súper simple:
+                            // Solo leemos la propiedad del UserSession, que SIEMPRE está actualizada.
+                            if userSession.hayUsuarioGuardado {
+                                showingConfirmationDialog = true
+                            } else {
+                                // Si no hay usuario, compartimos directamente sin preguntar.
+                                compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: false)
+                                compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                            }
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                                .imageScale(.large)
                         }
-                  
-                        Button("NO") {
-                            compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: false)
-                            compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                        // El diálogo solo se mostrará cuando hay un usuario,
+                        .confirmationDialog(
+                            "¿Compartir datos de pago móvil?",
+                            isPresented: $showingConfirmationDialog,
+                            titleVisibility: .visible
+                        ) {
+                            Button("SI") {
+                                compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: true)
+                                mostrarDialogoImagen = true
+                            }
+                            
+                            Button("NO") {
+                                compartirTexto = generarTextoParaCompartir(incluirDatosUsuario: false)
+                                compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                            }
+                            
+                            Button("Cancelar", role: .cancel) { }
+                        }
+                        .confirmationDialog(
+                            "¿Deseas incluir tu imagen personalizada de pago móvil?",
+                            isPresented: $mostrarDialogoImagen,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Sí, incluir imagen") {
+                                compartirCapturaConTextoYImagen(compartirImagenDePago: true)
+                            }
+                            Button("No incluir imagen") {
+                                compartirCapturaConTextoYImagen(compartirImagenDePago: false)
+                            }
+                            Button("Cancelar", role: .cancel) { }
                         }
                         
-                        Button("Cancelar", role: .cancel) { }
+                        
                     }
-                    .confirmationDialog(
-                        "¿Deseas incluir tu imagen personalizada de pago móvil?",
-                        isPresented: $mostrarDialogoImagen,
-                        titleVisibility: .visible
-                    ) {
-                        Button("Sí, incluir imagen") {
-                            compartirCapturaConTextoYImagen(compartirImagenDePago: true)
-                        }
-                        Button("No incluir imagen") {
-                            compartirCapturaConTextoYImagen(compartirImagenDePago: false)
-                        }
-                        Button("Cancelar", role: .cancel) { }
-                    }
-                                    
-                    
-                              }
-                          }
-                      }
-                        .navigationViewStyle(.stack)
+                }
+                
+            }
+            .navigationViewStyle(.stack)
+            // Se añade espacio en la parte inferior para que el banner no tape el contenido
+           // .padding(.bottom, 50)
+            
+            // 👇 Solo muestra el banner si NO estamos en período sin anuncios.
+        //    if !adState.isAdFree {
+        //        BannerAdView()
+        //            .frame(height: 50)
+         //   }
+          
+            if !adState.isAdFree && RemoteConfigManager.shared.showBannerAd {
+                 BannerAdView()
+                     .frame(height: 50)
+             }
+            
+        }
+      
+            // 3. AÑADIMOS EL BOTÓN EXTENDIDO (ExtendedFAB) AQUÍ
+         //   if !adState.isAdFree {
+         //       ExtendedFAB {
+         //           self.mostrarAlertaRecompensa = true
+         //       }
+                // AÑADIMOS LA CONDICIÓN DE REMOTE CONFIG
+            if !adState.isAdFree &&
+                          RemoteConfigManager.shared.showRewardedAd &&
+                          rewardedAdCoordinator.isReady { // <-- LA NUEVA CONDICIÓN
+                       ExtendedFAB {
+                           self.mostrarAlertaRecompensa = true
+                   }
+                .padding(.horizontal,30)
+                .padding(.bottom, 140)
+                .transition(.scale.animation(.spring()))
+               
+            }
+        }
+  
         
+        .ignoresSafeArea(.keyboard) // Fin del ZStack
+        
+        .alert(isPresented: $mostrarAlertaRecompensa) {
+            Alert(
+                title: Text("Versión Premium Gratis"),
+                message: Text("Si ves un anuncio corto, obtendrás 4 horas de la aplicación sin publicidad."),
+                primaryButton: .default(Text("Aceptar"), action: {
+                    rewardedAdCoordinator.showAd()
+                }),
+                secondaryButton: .cancel(Text("Ahora no"))
+            )
+        }
+        
+        //    Está "escuchando" el cambio en la propiedad del coordinador.
+        .alert("¡Felicidades!", isPresented: $rewardedAdCoordinator.showAlertAfterReward) {
+            Button("¡Genial!", role: .cancel) { }
+        } message: {
+            Text("Has ganado 4 horas sin publicidad en la app.")
+        }
+        .onAppear {
+            rewardedAdCoordinator.onRewardEarned = {
+                adState.grantReward()
+            }
+            rewardedAdCoordinator.loadAd()
+        }
         // =================================================================
         // PASO 2: AÑADIMOS EL MODIFICADOR .onAppear PARA EJECUTAR LA LÓGICA
         // =================================================================
-                        .onChange(of: scenePhase) { oldPhase, newPhase in
-                            // Esta condición se cumplirá cuando la app pase a primer plano.
-                            // Es el momento perfecto y seguro para ejecutar nuestra lógica.
-                            if newPhase == .active {
-                                // activar cuandi quiera subir anuncios
-                                //showLaunchAd()
-                                
-                                //Funcion para pedir los permisos
-                                requestTrackingPermission()
-                                // Lógica de la reseña
-                                ReviewManager.shared.trackSession()
-                            }
-                        }
-                      
-                     
-                  }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            // Esta condición se cumplirá cuando la app pase a primer plano.
+            // Es el momento perfecto y seguro para ejecutar nuestra lógica.
+            if newPhase == .active {
+                
+                // 👇 AÑADIDO: Cada vez que la app se activa, comprueba el estado de la recompensa.
+                adState.updateAdFreeStatus()
+                
+                // 👇 MODIFICADO: Solo muestra el intersticial si NO estamos en período sin anuncios.
+              //  if !adState.isAdFree {
+                   // showLaunchAd() //activar el anuncio intersticial************
+             //   }
+                
+                if !adState.isAdFree && RemoteConfigManager.shared.showInterstitialAd {
+                         // Comentado temporalmente como pediste, pero aquí es donde va
+                          showLaunchAd()
+                     }
+                
+                //Funcion para pedir los permisos
+                requestTrackingPermission()
+                // Lógica de la reseña
+                ReviewManager.shared.trackSession()
+            }
+        }
+        
+        
+    }
     
     
     // ----- FUNCIONES AUXILIARES -----
@@ -174,10 +263,13 @@ struct ContentView: View {
                adCoordinator.showAd()
            }
        }
+    
+
    
     private func titleForSection(_ section: String) -> String {
         switch section {
         case Constants.DOLARALDIA: return "Calculadora"
+        case Constants.PLATAFORMAS: return "Plataformas"
         case Constants.PRECIOBCV: return "Precios Oficiales"
         case Constants.HISTORIA_BCV: return "Historial BCV"
         case Constants.LISTAPMOVILES: return "Pago Móvil"

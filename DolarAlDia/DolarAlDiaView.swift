@@ -13,18 +13,25 @@ struct DolarAlDiaView: View {
     @Binding var tasaBCV: String
     @Binding var tasaEuro: String
     @Binding var selectedButton: String
-    
+    @Environment(\.colorScheme) var colorScheme
 
-    @State private var porcentajeParalelo: String = ""
+   
+    @State private var tasaUSDT: String = ""
+    @State private var porcentajeUSDT: String = ""
+    @State private var simboloUSDT: String = ""
+    @State private var fechaActualizacionUSDT: String = "Cargando..."
+
+   
+    @State private var porcentajeEuro: String = ""
     @State private var porcentajeBcv: String = ""
     @State private var simboloBcv: String = ""
-    @State private var simboloParalelo: String = ""
+    @State private var simboloEuro: String = ""
     @State private var fechaActualizacionParalelo: String = "Cargando..."
     @State private var fechaActualizacionBCV: String = "Cargando..."
     @State private var tasaBCVFutura: String = ""
     @State private var tasaEuroFutura: String = ""
     @State private var porcentajeBcvFuturo: String = ""
-    @State private var porcentajeParaleloFuturo: String = ""
+    @State private var porcentajeEuroFuturo: String = ""
     @State private var fechaFuturaBCV: String = ""
     @State private var fechaFuturaEuro: String = ""
     @State private var hayDatosFuturos: Bool = false
@@ -40,29 +47,45 @@ struct DolarAlDiaView: View {
     @State private var diferenciaBs = 0.0
     @State private var diferenciaDolares = 0.0
     @State private var diferenciaPorcentual = 0.0
-    
-    @Environment(\.colorScheme) var colorScheme
+    // 👇 Estado para mostrar/ocultar la vista de estado de la recompensa.
+    @State private var showingRewardStatus = false
     
 
+    @EnvironmentObject var adState: AdState // Necesitamos acceso directo aquí
     
+   
+    
+    // MARK: - Propiedades Computadas (Sin cambios)
     var placeholderMoneda: String {
-        selectedButton == Constants.DOLARBCV ? "Dólares" : "Euro"
+        switch selectedButton {
+        case Constants.DOLARBCV: return "Dólares"
+        case Constants.DOLAREUROBCV: return "Euro"
+        case Constants.DOLARUSDT: return "USDT"
+        default: return "Dólares"
+        }
     }
+    
     var startIconMoneda: String {
-        selectedButton == Constants.DOLARBCV ? "icon-dollar" : "euro"
+        switch selectedButton {
+        case Constants.DOLARBCV: return "icon-dollar"
+        case Constants.DOLAREUROBCV: return "euro"
+        case Constants.DOLARUSDT: return "usdt"
+        default: return "icon-dollar"
+        }
     }
 
-    // --- BODY PRINCIPAL (SIMPLIFICADO) ---
+    // MARK: - Body Principal
     var body: some View {
+        // 1. EL CUERPO PRINCIPAL DEBE SER UN ZSTACK PARA PERMITIR LA SUPERPOSICIÓN
         ZStack {
-            VStack(spacing: 20) {
-                // Llamamos a la vista extraída
+            
+            VStack(spacing: 5) { // <-- CAMBIO: Espaciado general reducido de 10 a 5
                 mainContentView
+                
             }
-            .padding()
+       
+            .padding(.horizontal)
             .onAppear {
-                
-                
                 Task {
                     await cargarDatosCacheados()
                     isLoading = true
@@ -80,86 +103,160 @@ struct DolarAlDiaView: View {
                 .presentationDetents([.medium, .large])
             }
             
-            // Llamamos a los controles inferiores
-            bottomControlsView
+           // bottomControlsView
             
-            // Overlays (sin cambios)
             if showToast { toastView }
             if isLoading { loadingView }
             if let message = statusMessage { statusMessageView(message) }
+            
+           
        }
        .onTapGesture {
            campoEnfocado = nil
        }
-    }
+        // 👇Este modificador presentará la nueva vista cuando showingRewardStatus sea true.
+       .sheet(isPresented: $showingRewardStatus) {
+           RewardStatusView()
+               .presentationDetents([.medium])
+       }
+        
+   
+           }
 
+   
     
-    // 1. Vista para el contenido principal
+
+    // MARK: - Vistas Extraídas (Con Cambios)
     private var mainContentView: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 10) {
-                Image("logoredondo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80, height: 80)
-                
-                HStack(spacing: 20) {
-                    BotonInfoPrecio(mostrar:true, valorDolar: tasaBCV, nombreDolar: Constants.DOLARBCV, simboloFlecha: simboloBcv, variacionPorcentaje: porcentajeBcv, isSelected: selectedButton == Constants.DOLARBCV, mostrarTasasFuturas: mostrarTasasFuturas) {
-                        selectedButton = Constants.DOLARBCV
-                        convertirDolaresABolivares()
-                        convertirBolivaresADolares()
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    BotonInfoPrecio(mostrar:true, valorDolar: tasaEuro, nombreDolar: Constants.DOLAREUROBCV, simboloFlecha: simboloParalelo, variacionPorcentaje: porcentajeParalelo, isSelected: selectedButton == Constants.DOLAREUROBCV, mostrarTasasFuturas: mostrarTasasFuturas) {
-                        selectedButton = Constants.DOLAREUROBCV
-                        convertirDolaresABolivares()
-                        convertirBolivaresADolares()
-                    }
-                    .frame(maxWidth: .infinity)
+        // 1. Contenedor VStack principal que aloja tanto a GeometryReader como a bottomControlsView.
+        VStack {
+            GeometryReader { geometry in
+                VStack(spacing: 4) {
+                    logoView
+                    priceButtons(geometry: geometry)
+                    inputFieldsView
+                    // Se elimina bottomControlsView de aquí
                 }
-
-                HStack {
-                    VStack(alignment: .leading, spacing: -10) {
-                        HStack {
-                            TextFieldPersonal(placeholder: placeholderMoneda, startIcon: startIconMoneda, text: $dolares, onClearAll: limpiarCampos)
-                                .focused($campoEnfocado, equals: .dolares)
-                                .onChange(of: dolares) { convertirDolaresABolivares() }
-                            Button(action: { UIPasteboard.general.string = dolares; showToastMessage() }) {
-                                Image(systemName: "doc.on.doc").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
-                            }
-                        }
-                        HStack {
-                            TextFieldPersonal(placeholder: "Bolivares", startIcon: "icon-bs", text: $bolivares, onClearAll: limpiarCampos)
-                                .focused($campoEnfocado, equals: .bolivares)
-                                .onChange(of: bolivares) { convertirBolivaresADolares() }
-                            Button(action: { UIPasteboard.general.string = bolivares; showToastMessage() }) {
-                                Image(systemName: "doc.on.doc").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
-                            }
-                        }
-                    }
-                    Button(action: {
-                        calcularDiferencia()
-                        showSheet = true
-                    }){
-                        Image(systemName: "mail.and.text.magnifyingglass").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
-                    }
-                }
-                .padding(10)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 2))
             }
-            .padding()
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(10)
-            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 2))
+
+            // 2. bottomControlsView se coloca aquí, fuera de GeometryReader pero dentro del VStack principal.
+            bottomControlsView
+        }
+        .ignoresSafeArea(.keyboard)
+    }
+    private var logoView: some View {
+            Image("logoredondo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 50, height: 50)
+                // AÑADIDO: El logo ahora abre el estado de la recompensa si está activa
+                .onTapGesture {
+                    if adState.isAdFree {
+                        self.showingRewardStatus = true
+                    }
+                }
+        }
+
+    private func priceButtons(geometry: GeometryProxy) -> some View {
+        VStack(alignment: .center, spacing: 5) {
+            let hStackSpacing: CGFloat = 10 // <-- CAMBIO: Espaciado horizontal también reducido
+            // El padding horizontal del contenedor padre es 8*2=16
+            let buttonWidth = (geometry.size.width - hStackSpacing - 16) / 2
+            
+            BotonInfoPrecio(
+                mostrar: true,
+                valorDolar: tasaUSDT,
+                nombreDolar: Constants.DOLARUSDT,
+                simboloFlecha: simboloUSDT,
+                variacionPorcentaje: porcentajeUSDT,
+                isSelected: selectedButton == Constants.DOLARUSDT,
+                mostrarTasasFuturas: mostrarTasasFuturas
+            ) {
+                selectedButton = Constants.DOLARUSDT
+                actualizarCalculos()
+            }
+            .frame(width: buttonWidth)
+            .frame(minHeight: 50) // Puedes ajustar este valor si lo necesitas
+            
+            HStack(spacing: hStackSpacing) {
+                BotonInfoPrecio(
+                    mostrar: true,
+                    valorDolar: tasaBCV,
+                    nombreDolar: Constants.DOLARBCV,
+                    simboloFlecha: simboloBcv,
+                    variacionPorcentaje: porcentajeBcv,
+                    isSelected: selectedButton == Constants.DOLARBCV,
+                    mostrarTasasFuturas: mostrarTasasFuturas
+                ) {
+                    selectedButton = Constants.DOLARBCV
+                    actualizarCalculos()
+                }
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 80) // Puedes ajustar este valor si lo necesitas
+
+                BotonInfoPrecio(
+                    mostrar: true,
+                    valorDolar: tasaEuro,
+                    nombreDolar: Constants.DOLAREUROBCV,
+                    simboloFlecha: simboloEuro,
+                    variacionPorcentaje: porcentajeEuro,
+                    isSelected: selectedButton == Constants.DOLAREUROBCV,
+                    mostrarTasasFuturas: mostrarTasasFuturas
+                ) {
+                    selectedButton = Constants.DOLAREUROBCV
+                    actualizarCalculos()
+                }
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 80) // Puedes ajustar este valor si lo necesitas
+            }
         }
     }
+
+    private var inputFieldsView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: -10) { // El spacing negativo ya es muy compacto, se mantiene
+                HStack {
+                    TextFieldPersonal(placeholder: placeholderMoneda, startIcon: startIconMoneda, text: $dolares, onClearAll: limpiarCampos)
+                        .focused($campoEnfocado, equals: .dolares)
+                        .onChange(of: dolares) { convertirDolaresABolivares() }
+                    Button(action: { UIPasteboard.general.string = dolares; showToastMessage() }) {
+                        Image(systemName: "doc.on.doc").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
+                    }
+                }
+                HStack {
+                    TextFieldPersonal(placeholder: "Bolivares", startIcon: "icon-bs", text: $bolivares, onClearAll: limpiarCampos)
+                        .focused($campoEnfocado, equals: .bolivares)
+                        .onChange(of: bolivares) { convertirBolivaresADolares() }
+                    Button(action: { UIPasteboard.general.string = bolivares; showToastMessage() }) {
+                        Image(systemName: "doc.on.doc").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
+                    }
+                }
+            }
+            Button(action: {
+                calcularDiferencia()
+                showSheet = true
+            }){
+                Image(systemName: "mail.and.text.magnifyingglass").resizable().frame(width: 24, height: 24).foregroundColor(.blue)
+            }
+        }
+        .padding(.vertical, 2)
+    }
     
-    // 2. Vista para los controles inferiores
+    // MARK: - Vistas Inferiores y Overlays (Sin cambios relevantes para la compactación superior)
+    
+    // En DolarAlDiaView.swift
+
     private var bottomControlsView: some View {
         VStack {
-            Spacer()
+            // ***** CAMBIO CLAVE: Volvemos a añadir el Spacer *****
+            // Esto es lo que empuja toda la sección hacia abajo.
+            //Spacer()
             
-            // Switch
             if hayDatosFuturos {
                 HStack {
                     Spacer()
@@ -169,7 +266,7 @@ struct DolarAlDiaView: View {
                     }
                     .tint(.blue)
                     .fixedSize()
-                    .padding(.vertical)
+                    .padding(.vertical, 8) // Mantenemos el padding compacto
                     Spacer()
                 }
                 .padding(.horizontal)
@@ -180,98 +277,103 @@ struct DolarAlDiaView: View {
                 }
             }
 
-            // Indicador offline
-            HStack(alignment: .center, spacing: 15) {
+            HStack(alignment: .center, spacing: 5) {
                 if isOffline {
                     Image(systemName: "wifi.exclamationmark").font(.title2).foregroundColor(.orange).transition(.scale.animation(.spring()))
                 }
             }
+            
+            // Usamos un VStack con espaciado reducido para el diseño compacto
+            VStack(spacing: 4) {
+                dateTextView(
+                    text: mostrarTasasFuturas
+                    ? "Tasa Futura: \(fechaFuturaBCV.components(separatedBy: ",").first ?? fechaFuturaBCV)"
+                    : "Act. BCV: \(fechaActualizacionBCV.components(separatedBy: ",").first ?? fechaActualizacionBCV)",
+                    color: mostrarTasasFuturas ? .orange : (animateDateUpdate ? .green : .gray)
+                )
                 
-        
-            // Fecha y botón de refrescar
-            VStack {
-                Text(mostrarTasasFuturas ? "Tasa Futura para: \(fechaFuturaBCV.components(separatedBy: ",").first ?? fechaFuturaBCV)" : "Act. BCV: \(fechaActualizacionBCV.components(separatedBy: ",").first ?? fechaActualizacionBCV)")
-                    .font(.body)
-                    .fontWeight(.bold)
-                    // Si se muestran las tasas futuras, el color es naranja.
-                    // Si no, mantiene el efecto de 'glow' verde cuando se actualiza.
-                    .foregroundColor(mostrarTasasFuturas ? .orange : (animateDateUpdate ? .green : .gray))
-                    
-                    // Efecto de 'glow' solo para la actualización normal
-                    .scaleEffect(animateDateUpdate && !mostrarTasasFuturas ? 1.1 : 1.0)
-                    .shadow(
-                        color: animateDateUpdate && !mostrarTasasFuturas ? .green.opacity(0.5) : .clear,
-                        radius: 5, x: 0, y: 0
-                    )
-                    .padding(.bottom, 2)
+                dateTextView(
+                    text: "Act. USDT: \(fechaActualizacionUSDT)",
+                    color: animateDateUpdate ? .green : .gray
+                )
                 
                 Button(action: {
                     Task { isLoading = true; await llamarApiDolar(); isLoading = false }
                 }) {
                     Image(systemName: "arrow.clockwise.circle.fill").resizable().frame(width: 50, height: 50).foregroundColor(.blue)
                 }
+                .padding(.top, 15) // El padding ahora está solo en el botón
             }
-            .padding(.bottom, 30)
+            .padding(.bottom, 50) // Mantenemos el padding inferior para separar del borde
+            
         }
         .ignoresSafeArea(.keyboard)
     }
     
-    // --- VISTAS DE OVERLAY
     var toastView: some View {
-           ZStack {
-               Color.clear
-               VStack {
-                   Text("Valor copiado al portapapeles").font(.headline).padding().background(Color.black.opacity(0.6)).foregroundColor(.white).cornerRadius(10)
-               }
-           }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear).transition(.opacity)
-       }
-       
-       var loadingView: some View {
-           ZStack {
-               Color.black.opacity(0.5).edgesIgnoringSafeArea(.all)
-               ProgressView("Actualizando...").progressViewStyle(CircularProgressViewStyle()).padding().background(colorScheme == .dark ? Color.black : Color.white).foregroundColor(colorScheme == .dark ? Color.white : Color.black).cornerRadius(10).shadow(radius: 10)
-           }
-       }
-    func statusMessageView(_ message: String) -> some View {
+       ZStack {
+           Color.clear
            VStack {
-               Spacer()
-               Text(message).font(.headline).foregroundColor(.white).padding().background(.black.opacity(0.6)).clipShape(Capsule()).transition(.move(edge: .bottom).combined(with: .opacity))
-           }.padding(.bottom, 140)
-       }
-    
-    
-    // --- LÓGICA Y FUNCIONES
-    private func parseDate(from dateString: String) -> Date? {
-          let formatter = DateFormatter()
-          formatter.dateFormat = "dd/MM/yyyy, hh:mm a"
-          formatter.locale = Locale(identifier: "en_US_POSIX")
-          return formatter.date(from: dateString)
-      }
-    private var isDolaresFocused: Bool { campoEnfocado == .dolares }
-    func showToastMessage() {
-            withAnimation { showToast = true }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation { showToast = false }
-            }
-        }
-        
-        func cargarDatosCacheados() async {
-               if let cachedData = CacheManager.shared.load() {
-                   self.tasaBCV = String(format: "%.2f", cachedData.tasaBCV)
-                   self.tasaEuro = String(format: "%.2f", cachedData.tasaEuro)
-                   self.porcentajeBcv = cachedData.porcentajeBcv
-                   self.porcentajeParalelo = cachedData.porcentajeParalelo
-                   self.simboloBcv = cachedData.simboloBcv
-                   self.simboloParalelo = cachedData.simboloParalelo
-                   self.fechaActualizacionBCV = cachedData.fechaActualizacionBCV
-                   self.fechaActualizacionParalelo = cachedData.fechaActualizacionParalelo
-                  
-               } else {
-                   print("No se encontraron datos en el caché.")
-               }
+               Text("Valor copiado al portapapeles").font(.headline).padding().background(Color.black.opacity(0.6)).foregroundColor(.white).cornerRadius(10)
            }
+       }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.clear).transition(.opacity)
+    }
+       
+    var loadingView: some View {
+       ZStack {
+           Color.black.opacity(0.5).edgesIgnoringSafeArea(.all)
+           ProgressView("Actualizando...").progressViewStyle(CircularProgressViewStyle()).padding().background(colorScheme == .dark ? Color.black : Color.white).foregroundColor(colorScheme == .dark ? Color.white : Color.black).cornerRadius(10).shadow(radius: 10)
+       }
+      
+    }
+        
+    
+    func statusMessageView(_ message: String) -> some View {
+       VStack {
+           Spacer()
+           Text(message).font(.headline).foregroundColor(.white).padding().background(.black.opacity(0.6)).clipShape(Capsule()).transition(.move(edge: .bottom).combined(with: .opacity))
+       }.padding(.bottom, 140)
+    }
+    
+
+
+    
+    // - Lógica y Funciones
+    private func parseDate(from dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy, hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: dateString)
+    }
+    
+    private var isDolaresFocused: Bool { campoEnfocado == .dolares }
+    
+    func showToastMessage() {
+        withAnimation { showToast = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation { showToast = false }
+        }
+    }
+        
+    func cargarDatosCacheados() async {
+        if let cachedData = CacheManager.shared.load() {
+            self.tasaBCV = String(format: "%.2f", cachedData.tasaBCV)
+            self.tasaEuro = String(format: "%.2f", cachedData.tasaEuro)
+            self.tasaUSDT = String(format: "%.2f", cachedData.tasaUSDT)
+            self.porcentajeBcv = cachedData.porcentajeBcv
+            self.porcentajeUSDT = cachedData.porcentajeUSDT
+            self.simboloBcv = cachedData.simboloBcv
+            self.simboloUSDT = cachedData.simboloUSDT
+            self.fechaActualizacionBCV = cachedData.fechaActualizacionBCV
+            self.fechaActualizacionUSDT = cachedData.fechaActualizacionUSDT
+            // Aquí podrías cargar también los datos cacheados de USDT si los guardas
+        } else {
+            print("No se encontraron datos en el caché.")
+        }
+    }
+    
+    // ************************* FUNCIÓN MODIFICADA *************************
     func convertirDolaresABolivares() {
-        // Formateador para MOSTRAR el resultado en bolívares
         let outputFormatter = NumberFormatter()
         outputFormatter.numberStyle = .decimal
         outputFormatter.groupingSeparator = "."
@@ -279,20 +381,16 @@ struct DolarAlDiaView: View {
         outputFormatter.minimumFractionDigits = 2
         outputFormatter.maximumFractionDigits = 2
         
-        // Formateador para INTERPRETAR la entrada del usuario
         let inputFormatter = NumberFormatter()
         inputFormatter.numberStyle = .decimal
-        // Le decimos que intente adivinar el separador local del usuario
         inputFormatter.locale = Locale.current
 
         if isDolaresFocused {
-            // Ya no usamos normalizaNumero.
             guard !dolares.isEmpty else {
                 self.bolivares = ""
                 return
             }
 
-            // Dejamos que el NumberFormatter interprete el texto del usuario
             if let dolaresNumber = inputFormatter.number(from: dolares) {
                 let dolaresValue = dolaresNumber.doubleValue
                 
@@ -302,27 +400,24 @@ struct DolarAlDiaView: View {
                     tasa = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0
                 case Constants.DOLAREUROBCV:
                     tasa = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0
+                // --- AÑADIMOS EL CASO PARA USDT ---
+                case Constants.DOLARUSDT:
+                    tasa = Double(tasaUSDT.replacingOccurrences(of: ",", with: ".")) ?? 0
                 default:
                     break
                 }
                 
                 let bolivaresValue = dolaresValue * tasa
-                
-                // Usamos el formateador de salida para mostrar el resultado
                 self.bolivares = outputFormatter.string(from: NSNumber(value: bolivaresValue)) ?? ""
                 
             } else {
-                // Si el formateador no puede interpretar el número, limpiamos el campo de bolívares.
-                // Esto puede pasar si el usuario escribe "abc"
                 self.bolivares = ""
             }
         }
     }
-
+    // ********************* FIN DE LA FUNCIÓN MODIFICADA *********************
   
-
     func convertirBolivaresADolares() {
-        // Formateador para MOSTRAR el resultado en el formato deseado (ej: 1.234,56)
         let outputFormatter = NumberFormatter()
         outputFormatter.numberStyle = .decimal
         outputFormatter.groupingSeparator = "."
@@ -330,20 +425,16 @@ struct DolarAlDiaView: View {
         outputFormatter.minimumFractionDigits = 2
         outputFormatter.maximumFractionDigits = 2
         
-        // Formateador para INTERPRETAR la entrada de texto del usuario
         let inputFormatter = NumberFormatter()
         inputFormatter.numberStyle = .decimal
-        // Permite que el formateador entienda la configuración regional del usuario (punto o coma decimal)
         inputFormatter.locale = Locale.current
 
         if !isDolaresFocused {
-            // Ya no usamos normalizaNumero.
             guard !bolivares.isEmpty else {
                 self.dolares = ""
                 return
             }
 
-            // Dejamos que el NumberFormatter interprete el texto del usuario
             if let bolivaresNumber = inputFormatter.number(from: bolivares) {
                 let bolivaresValue = bolivaresNumber.doubleValue
                 
@@ -353,93 +444,99 @@ struct DolarAlDiaView: View {
                     tasa = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0
                 case Constants.DOLAREUROBCV:
                     tasa = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0
+                // --- AÑADIMOS EL CASO PARA USDT ---
+                case Constants.DOLARUSDT:
+                    tasa = Double(tasaUSDT.replacingOccurrences(of: ",", with: ".")) ?? 0
                 default:
                     break
                 }
                 
-                // Verificamos que la tasa no sea cero para evitar divisiones por infinito
                 if tasa > 0 {
                     let dolaresValue = bolivaresValue / tasa
-                    
-                    // Usamos el formateador de salida para mostrar el resultado
                     self.dolares = outputFormatter.string(from: NSNumber(value: dolaresValue)) ?? ""
                 } else {
                     self.dolares = ""
                 }
                 
             } else {
-                // Si el formateador no puede interpretar el número (ej: "abc"), limpiamos el campo de dólares.
                 self.dolares = ""
             }
         }
     }
+    // ********************* FIN DE LA FUNCIÓN MODIFICADA *********************
 
-           func normalizaNumero(_ valor: String) -> String {
-               var limpio = valor.replacingOccurrences(of: ".", with: "")
-               limpio = limpio.replacingOccurrences(of: ",", with: ".")
-               limpio = limpio.replacingOccurrences(of: " ", with: "")
-               return limpio
-           }
+    func normalizaNumero(_ valor: String) -> String {
+       var limpio = valor.replacingOccurrences(of: ".", with: "")
+       limpio = limpio.replacingOccurrences(of: ",", with: ".")
+       limpio = limpio.replacingOccurrences(of: " ", with: "")
+       return limpio
+    }
+    
     func limpiarCampos() { dolares = ""; bolivares = "" }
     
-    func actualizarVistasConTasas() {
-        if mostrarTasasFuturas {
-            // Usar datos futuros
-            tasaBCV = tasaBCVFutura
-            tasaEuro = tasaEuroFutura
-            porcentajeBcv = porcentajeBcvFuturo
-            porcentajeParalelo = porcentajeParaleloFuturo
-        } else {
 
-            cargarDatosActualesGuardados()
-        }
-        
+    // Centraliza la lógica de conversión para no repetir código.
+    func actualizarCalculos() {
         if campoEnfocado == .dolares || campoEnfocado == nil {
-            // Si el usuario estaba escribiendo en dólares (o no estaba escribiendo en ninguno),
-            // actualizamos los bolívares.
             convertirDolaresABolivares()
         } else {
-            // Si el usuario estaba escribiendo en bolívares,
-            // actualizamos los dólares.
             convertirBolivaresADolares()
         }
     }
+   
     
-
-    // Esta función carga los últimos datos 'actuales' que guardamos en el caché.
+    func actualizarVistasConTasas() {
+        if mostrarTasasFuturas {
+            tasaBCV = tasaBCVFutura
+            tasaEuro = tasaEuroFutura
+            porcentajeBcv = porcentajeBcvFuturo
+            porcentajeEuro = porcentajeEuroFuturo
+            // Aquí podrías añadir la lógica para las tasas futuras de USDT
+        } else {
+            cargarDatosActualesGuardados()
+        }
+        actualizarCalculos()
+    }
+    
     func cargarDatosActualesGuardados() {
-        
-        // Es lo que se usa cuando el Switch se desactiva.
         if let cachedData = CacheManager.shared.load() {
             tasaBCV = String(format: "%.2f", cachedData.tasaBCV)
             tasaEuro = String(format: "%.2f", cachedData.tasaEuro)
             porcentajeBcv = cachedData.porcentajeBcv
-            porcentajeParalelo = cachedData.porcentajeParalelo
-            
+            porcentajeEuro = cachedData.porcentajeUSDT
+            // Aquí podrías cargar también los datos cacheados de USDT
         }
     }
         
-        //llamada al api
+
+    // ************************* FUNCIÓN DE API  *************************
     func llamarApiDolar() async {
         do {
             print("🚀 Iniciando llamada a la API de Dólar...")
             let apiService = ApiNetworkDolarAlDia()
             let dollarData = try await apiService.getDollarRates()
-            let now = Date()
+        
             
+            let now = Date()
+        
+            // --- CAMBIO: Renombradas las propiedades para Euro ---
             var datosActuales = (
-                tasaBCV: 0.0, tasaEuro: 0.0, porcentajeBcv: "", porcentajeParalelo: "",
-                simboloBcv: "", simboloParalelo: "", fechaBCV: "", fechaEuro: ""
+                tasaBCV: 0.0, tasaEuro: 0.0, tasaUSDT: 0.0,
+                porcentajeBcv: "", porcentajeEuro: "", porcentajeUSDT: "",
+                simboloBcv: "", simboloEuro: "", simboloUSDT: "",
+                fechaBCV: "", fechaEuro: "", fechaUSDT: ""
             )
             
+            // --- CAMBIO: Renombradas las propiedades para Euro ---
             var datosFuturos = (
-                tasaBCV: "", tasaEuro: "", porcentajeBcv: "", porcentajeParalelo: "",
+                tasaBCV: "", tasaEuro: "",
+                porcentajeBcv: "", porcentajeEuro: "",
                 fechaBCV: "", fechaEuro: ""
             )
             
             var hayDataFuturaTemporal = false
 
-            // Procesamos el Dólar (USD)
+            // --- Procesamos el Dólar (USD) ---
             if let usdMonitor = dollarData.monitors["usd"] {
                 let lastUpdateDate = parseDate(from: usdMonitor.lastUpdate) ?? now
                 if lastUpdateDate > now {
@@ -449,8 +546,10 @@ struct DolarAlDiaView: View {
                     datosFuturos.fechaBCV = usdMonitor.lastUpdate
                     
                     datosActuales.tasaBCV = usdMonitor.priceOld
-                    datosActuales.porcentajeBcv = String(format: "%.2f", usdMonitor.percentOld ?? 0.0)
-                    datosActuales.fechaBCV = usdMonitor.lastUpdateOld ?? "N/A"
+                    datosActuales.porcentajeBcv = String(format: "%.2f", usdMonitor.percentOld)
+                    datosActuales.fechaBCV = usdMonitor.lastUpdateOld
+                    
+                    
                 } else {
                     datosActuales.tasaBCV = usdMonitor.price
                     datosActuales.porcentajeBcv = String(format: "%.2f", usdMonitor.percent)
@@ -459,67 +558,107 @@ struct DolarAlDiaView: View {
                 datosActuales.simboloBcv = usdMonitor.symbol
             }
 
-            // Procesamos el Euro (EUR)
+            // --- Procesamos el Euro (EUR) ---
             if let eurMonitor = dollarData.monitors["eur"] {
-                let lastUpdateDate = parseDate(from: eurMonitor.lastUpdate) ?? now
+                 let lastUpdateDate = parseDate(from: eurMonitor.lastUpdate) ?? now
                 if lastUpdateDate > now {
                     hayDataFuturaTemporal = true
+                    // --- CAMBIO: Usando .porcentajeEuro ---
                     datosFuturos.tasaEuro = String(format: "%.2f", eurMonitor.price)
-                    datosFuturos.porcentajeParalelo = String(format: "%.2f", eurMonitor.percent)
+                    datosFuturos.porcentajeEuro = String(format: "%.2f", eurMonitor.percent)
                     datosFuturos.fechaEuro = eurMonitor.lastUpdate
-
+                    
+                    // --- CAMBIO: Usando .porcentajeEuro ---
                     datosActuales.tasaEuro = eurMonitor.priceOld
-                    datosActuales.porcentajeParalelo = String(format: "%.2f", eurMonitor.percentOld ?? 0.0)
-                    datosActuales.fechaEuro = eurMonitor.lastUpdateOld ?? "N/A"
-                } else {
+                    datosActuales.porcentajeEuro = String(format: "%.2f", eurMonitor.percentOld)
+                    datosActuales.fechaEuro = eurMonitor.lastUpdateOld
+                    
+                    // --- CAMBIO: Usando .porcentajeEuro en el log ---
+                    print("🔍 Procesando datos FUTUROS para EUR: Tasa=\(datosFuturos.tasaEuro), Porcentaje=\(datosFuturos.porcentajeEuro), Fecha=\(datosFuturos.fechaEuro)")
+                    
+                }  else {
+                    // --- CAMBIO: Usando .porcentajeEuro ---
                     datosActuales.tasaEuro = eurMonitor.price
-                    datosActuales.porcentajeParalelo = String(format: "%.2f", eurMonitor.percent)
+                    datosActuales.porcentajeEuro = String(format: "%.2f", eurMonitor.percent)
                     datosActuales.fechaEuro = eurMonitor.lastUpdate
                 }
-                datosActuales.simboloParalelo = eurMonitor.symbol
+                // --- CAMBIO: Usando .simboloEuro ---
+                datosActuales.simboloEuro = eurMonitor.symbol
             }
             
-        
-            
-            // Guardamos el caché con los datos ACTUALES (sin importar la prueba)
-            let dataToCache = DollarDataCache(
-                tasaBCV: datosActuales.tasaBCV,
-                tasaEuro: datosActuales.tasaEuro,
-                porcentajeBcv: datosActuales.porcentajeBcv,
-                porcentajeParalelo: datosActuales.porcentajeParalelo,
-                simboloBcv: datosActuales.simboloBcv,
-                simboloParalelo: datosActuales.simboloParalelo,
-                fechaActualizacionBCV: datosActuales.fechaBCV,
-                fechaActualizacionParalelo: datosActuales.fechaEuro,
-                timestamp: Date()
-            )
-            CacheManager.shared.save(data: dataToCache)
-          
+            // --- Procesamos USDT ---
+            if let usdtMonitor = dollarData.monitors["usdt"] {
+                datosActuales.tasaUSDT = usdtMonitor.price
+                datosActuales.porcentajeUSDT = String(format: "%.2f", usdtMonitor.percent)
+                datosActuales.fechaUSDT = usdtMonitor.lastUpdate
+                datosActuales.simboloUSDT = usdtMonitor.symbol
+            }
+         
 
-            // Actualizamos las variables de estado para la UI
-            self.hayDatosFuturos = hayDataFuturaTemporal
-            
-            self.tasaBCVFutura = datosFuturos.tasaBCV
-            self.tasaEuroFutura = datosFuturos.tasaEuro
-            self.porcentajeBcvFuturo = datosFuturos.porcentajeBcv
-            self.porcentajeParaleloFuturo = datosFuturos.porcentajeParalelo
-            self.fechaFuturaBCV = datosFuturos.fechaBCV
-            
-            self.tasaBCV = String(format: "%.2f", datosActuales.tasaBCV)
-            self.tasaEuro = String(format: "%.2f", datosActuales.tasaEuro)
-            self.porcentajeBcv = datosActuales.porcentajeBcv
-            self.porcentajeParalelo = datosActuales.porcentajeParalelo
-            self.simboloBcv = datosActuales.simboloBcv
-            self.simboloParalelo = datosActuales.simboloParalelo
-            self.fechaActualizacionBCV = datosActuales.fechaBCV
-            self.fechaActualizacionParalelo = datosActuales.fechaEuro
-            
-            actualizarVistasConTasas()
-            calcularDiferencia()
-            
-            if isOffline { isOffline = false; showStatusMessage("¡Conexión restablecida!") }
-            
+            // --- ACTUALIZACIÓN SEGURA Y CENTRALIZADA EN EL HILO PRINCIPAL ---
             await MainActor.run {
+                // Actualiza los valores actuales de USD
+                self.tasaBCV = String(format: "%.2f", datosActuales.tasaBCV)
+                self.porcentajeBcv = datosActuales.porcentajeBcv
+                self.simboloBcv = datosActuales.simboloBcv
+                self.fechaActualizacionBCV = datosActuales.fechaBCV
+                
+                // ---Actualizando las variables de estado de Euro ---
+                self.tasaEuro = String(format: "%.2f", datosActuales.tasaEuro)
+                self.porcentajeEuro = datosActuales.porcentajeEuro
+                self.simboloEuro = datosActuales.simboloEuro // Se actualiza la variable de estado 'simboloParalelo'
+                
+                // Actualiza los valores actuales de USDT
+                self.tasaUSDT = String(format: "%.2f", datosActuales.tasaUSDT)
+                self.porcentajeUSDT = datosActuales.porcentajeUSDT
+                self.simboloUSDT = datosActuales.simboloUSDT
+                self.fechaActualizacionUSDT = datosActuales.fechaUSDT
+                
+                // Actualiza los valores futuros si existen
+                self.hayDatosFuturos = hayDataFuturaTemporal
+                if hayDataFuturaTemporal {
+                    self.tasaBCVFutura = datosFuturos.tasaBCV
+                    self.porcentajeBcvFuturo = datosFuturos.porcentajeBcv
+                    self.fechaFuturaBCV = datosFuturos.fechaBCV
+                    self.tasaEuroFutura = datosFuturos.tasaEuro
+                    self.porcentajeEuroFuturo = datosFuturos.porcentajeEuro // Se actualiza la variable de estado 'porcentajeParaleloFuturo'
+                    self.fechaFuturaEuro = datosFuturos.fechaEuro
+                }
+                
+                
+                // --- INICIO DE LA LÓGICA DE GUARDADO ---
+                          print("💾 Preparando datos para guardar en caché...")
+                          let dataToCache = DollarDataCache(
+                              tasaBCV: datosActuales.tasaBCV,
+                              porcentajeBcv: datosActuales.porcentajeBcv,
+                              simboloBcv: datosActuales.simboloBcv,
+                              fechaActualizacionBCV: datosActuales.fechaBCV,
+                              tasaEuro: datosActuales.tasaEuro,
+                              porcentajeEuro: datosActuales.porcentajeEuro,
+                              simboloEuro: datosActuales.simboloEuro,
+                              fechaActualizacionEuro: datosActuales.fechaEuro,
+                              tasaUSDT: datosActuales.tasaUSDT,
+                              porcentajeUSDT: datosActuales.porcentajeUSDT,
+                              simboloUSDT: datosActuales.simboloUSDT,
+                              fechaActualizacionUSDT: datosActuales.fechaUSDT,
+                              timestamp: Date()
+                          )
+                          CacheManager.shared.save(data: dataToCache)
+                          // --- FIN DE LA LÓGICA DE GUARDADO ---
+                // El resto de la lógica (caché, cálculos, animación)
+                
+                if self.isOffline {
+                    // Usamos TU HapticManager para una vibración de éxito.
+                    HapticManager.shared.play(.success)
+                    showStatusMessage("Conexión exitosa") // Mensaje temporal
+                }
+                
+                // Actualiza el estado a "online".
+                self.isOffline = false
+                actualizarCalculos()
+                isOffline = false
+                statusMessage = nil
+                
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) { animateDateUpdate = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) { animateDateUpdate = false }
@@ -527,47 +666,62 @@ struct DolarAlDiaView: View {
             }
             
         } catch {
-            isOffline = true
-            showStatusMessage("No se pudo actualizar. Verifique su conexión.")
-            HapticManager.shared.play(.error)
+            print("❌ Error al llamar o procesar la API: \(error)")
+            await MainActor.run {
+                
+                // Solo activamos la vibración y el mensaje si no estábamos ya en modo offline.
+                if !self.isOffline {
+                    // Usamos TU HapticManager para una vibración de error.
+                    HapticManager.shared.play(.error)
+                    showStatusMessage("Falla de conexión") // Mensaje temporal
+                }
+                isOffline = true
+             
+                
+               
+            }
+        
+            
         }
     }
     
-    
     func showStatusMessage(_ message: String) {
-        // Usamos MainActor para asegurar que la actualización de la UI ocurra en el hilo principal
         Task { @MainActor in
             self.statusMessage = message
-            // Hacemos que el mensaje desaparezca después de 3 segundos
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             self.statusMessage = nil
         }
     }
 
     func calcularDiferencia() {
-        // 1. Preparamos el mensaje para el sheet de resultados.
         mensaje = "Diferencia Cambiaria"
-        
-        // 2. Convertimos las tasas de texto a números Double.
         let tasaEuroDouble = Double(tasaEuro.replacingOccurrences(of: ",", with: ".")) ?? 0.0
         let tasaBCVDouble = Double(tasaBCV.replacingOccurrences(of: ",", with: ".")) ?? 0.0
-        
-        // 3. Obtenemos el monto del TextField. Si está vacío, usamos '1.0' como valor por defecto.
         let dolaresDouble = Double(normalizaNumero(dolares)) ?? 1.0
         
-        // 4. Verificamos que la tasa del BCV sea válida para evitar división por cero.
         if tasaBCVDouble > 0 {
-            // Ahora los cálculos siempre se harán (para 1 dólar si el campo está vacío).
             diferenciaBs = (tasaEuroDouble * dolaresDouble) - (tasaBCVDouble * dolaresDouble)
             diferenciaDolares = diferenciaBs / tasaBCVDouble
             let diferenciaDeTasas = tasaEuroDouble - tasaBCVDouble
             diferenciaPorcentual = (diferenciaDeTasas / tasaBCVDouble) * 100
         } else {
-            // Si la tasa del BCV es 0, no se puede calcular nada.
             diferenciaBs = 0
             diferenciaDolares = 0
             diferenciaPorcentual = 0
         }
     }
-}
+    private func dateTextView(text: String, color: Color) -> some View {
+        Text(text)
+            .font(.body) // Mismo tamaño de fuente
+            .fontWeight(.bold) // Mismo grosor
+            .foregroundColor(color) // El color se pasa como parámetro
+            // Los efectos de animación se aplican a ambos
+            .scaleEffect(animateDateUpdate && !mostrarTasasFuturas ? 1.1 : 1.0)
+            .shadow(
+                color: animateDateUpdate && !mostrarTasasFuturas ? .green.opacity(0.5) : .clear,
+                radius: 5, x: 0, y: 0
+            )
+            .padding(.bottom, 2) // Mismo espaciado
+    }
 
+}
