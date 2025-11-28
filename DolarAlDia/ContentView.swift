@@ -44,6 +44,7 @@ struct ContentView: View {
     // 👇 AÑADIDO: Accede al gestor de estado de anuncios desde el entorno.
     @EnvironmentObject var adState: AdState
     
+    
     // =================================================================
     // PASO 1: AÑADIMOS LA INSTANCIA DEL COORDINADOR DE ANUNCIOS
     // =================================================================
@@ -190,6 +191,7 @@ struct ContentView: View {
                 adState.grantReward()
             }
             rewardedAdCoordinator.loadAd()
+          
         }
         // =================================================================
         // PASO 2: AÑADIMOS EL MODIFICADOR .onAppear PARA EJECUTAR LA LÓGICA

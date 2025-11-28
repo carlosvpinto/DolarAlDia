@@ -13,12 +13,13 @@ class RemoteConfigManager {
     
     private var remoteConfig: RemoteConfig
     
-    // Definimos las claves para evitar errores de tipeo
-    private enum ParameterKeys: String {
-        case showInterstitialAd
-        case showBannerAd
-        case showRewardedAd
-    }
+    // 👇 1. AÑADE LA NUEVA CLAVE AQUÍ
+       private enum ParameterKeys: String {
+           case showInterstitialAd
+           case showBannerAd
+           case showRewardedAd
+           case ios_minimum_required_version // <-- Nueva clave
+       }
     
     private init() {
         self.remoteConfig = RemoteConfig.remoteConfig()
@@ -31,7 +32,9 @@ class RemoteConfigManager {
         let defaultValues: [String: NSObject] = [
             ParameterKeys.showInterstitialAd.rawValue: true as NSObject,
             ParameterKeys.showBannerAd.rawValue: true as NSObject,
-            ParameterKeys.showRewardedAd.rawValue: true as NSObject
+            ParameterKeys.showRewardedAd.rawValue: true as NSObject,
+            // 👇 2. AÑADE UN VALOR POR DEFECTO PARA LA VERSIÓN
+            ParameterKeys.ios_minimum_required_version.rawValue: "1.0" as NSObject
         ]
         remoteConfig.setDefaults(defaultValues)
     }
@@ -41,8 +44,7 @@ class RemoteConfigManager {
     // En RemoteConfigManager.swift
 
     // En RemoteConfigManager.swift
-
-    func fetchConfig() {
+    func fetchConfig(completion: (() -> Void)? = nil) {
         let settings = RemoteConfigSettings()
         #if DEBUG
         settings.minimumFetchInterval = 0
@@ -52,22 +54,22 @@ class RemoteConfigManager {
         remoteConfig.fetchAndActivate { status, error in
             if let error = error {
                 print("❌ Error al obtener Remote Config: \(error.localizedDescription)")
+                // Aún llamamos a completion() en caso de error para que la app continúe.
+                completion?()
                 return
             }
             
-            // ***** ESTE ES EL CÓDIGO CORRECTO Y COMPLETO *****
-            // Elimina el caso que da el error y deja solo los que funcionan.
             switch status {
-                
             case .successFetchedFromRemote:
                 print("✅ Remote Config: Configuración activada con éxito.")
-                
             case .error:
                 print("❌ Remote Config: Error al activar la configuración.")
-                
             @unknown default:
                 print("⚠️ Remote Config: Estado desconocido.")
             }
+            
+            // 👇 LLAMA AL COMPLETION HANDLER AQUÍ, DESPUÉS DE QUE TODO HAYA TERMINADO.
+            completion?()
         }
     }
     // MARK: - Propiedades de Acceso
@@ -82,5 +84,11 @@ class RemoteConfigManager {
     
     var showRewardedAd: Bool {
         remoteConfig.configValue(forKey: ParameterKeys.showRewardedAd.rawValue).boolValue
+    }
+    
+
+    //    Esta propiedad nos dará directamente la versión requerida como un String.
+    var minimumRequiredVersion: String {
+        remoteConfig.configValue(forKey: ParameterKeys.ios_minimum_required_version.rawValue).stringValue ?? "1.0"
     }
 }

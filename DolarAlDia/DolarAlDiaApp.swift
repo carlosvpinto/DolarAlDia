@@ -24,8 +24,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
       //Configuracion Firebase
       FirebaseApp.configure()
-    //  MobileAds.shared.start(completionHandler: nil)
-      RemoteConfigManager.shared.fetchConfig()
+      MobileAds.shared.start(completionHandler: nil)
+     // RemoteConfigManager.shared.fetchConfig()
       requestAuthorizationForPushNotification(application: application)
       //ReviewManager.shared.trackSession()
 
@@ -60,6 +60,8 @@ import GoogleMobileAds
 
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    // 👇 1. AÑADE EL GESTOR DE VERSIONES AQUÍ
+      @StateObject private var versionManager = VersionCheckManager()
     init() {
       //  MobileAds.shared.start(completionHandler: nil)
        }
@@ -75,6 +77,19 @@ struct DolarAlDiaApp: App {
                 .environmentObject(userSession)
             // 👇 Inyecta el gestor de estado en el entorno de la app.
                 .environmentObject(adState)
+            // 👇 2. AÑADE LA COMPROBACIÓN Y LA PANTALLA DE ACTUALIZACIÓN AQUÍ
+                       .onAppear {
+                           // Le pedimos a Remote Config que cargue los valores y, cuando termine,
+                           // que ejecute la comprobación de la versión.
+                           RemoteConfigManager.shared.fetchConfig {
+                               versionManager.checkAppVersion()
+                           }
+                       }
+                       .fullScreenCover(isPresented: $versionManager.needsUpdate) {
+                           // Si 'needsUpdate' se vuelve true, esta vista bloqueará toda la app.
+                           ForceUpdateView(updateURL: versionManager.appStoreURL)
+                       }
+                   
         }
     }
 }

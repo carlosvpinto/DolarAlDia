@@ -103,7 +103,6 @@
 		DB45430B2DD6E72800B07E9C /* Exceptions for "DolarAlDia" folder in "DolarAlDia" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Herramientas/Untitled.swift,
 				Info.plist,
 			);
 			target = DBF6672C2CFC369100394884 /* DolarAlDia */;
