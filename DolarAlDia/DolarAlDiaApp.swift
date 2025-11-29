@@ -1,38 +1,48 @@
-//
-//  DolarAlDiaApp.swift
-//  DolarAlDia
-//
-//  Created by Carlos Vicente Pinto on 12/1/24.
-//
-
 import SwiftUI
 import GoogleMobileAds
 import Firebase
 import FirebaseMessaging
 
-
-
-
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+// 👇 1. AÑADE 'MessagingDelegate' A LA LISTA DE PROTOCOLOS
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
 
   func application(_ application: UIApplication,
-
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
       
-    
-          // --- FIN DEL CÓDIGO DE DIAGNÓSTICO ---
-
-      //Configuracion Firebase
+      // Configuración en el orden correcto
       FirebaseApp.configure()
       MobileAds.shared.start(completionHandler: nil)
-     // RemoteConfigManager.shared.fetchConfig()
+      
+      // 👇 2. ASIGNA EL DELEGADO DE FIREBASE MESSAGING
+      //    Esto le dice a Firebase que esta clase gestionará los eventos del token.
+      Messaging.messaging().delegate = self
+      
+      // La llamada a fetchConfig() se hace en la UI, por lo que aquí está correctamente comentada.
+      // RemoteConfigManager.shared.fetchConfig()
+      
       requestAuthorizationForPushNotification(application: application)
-      //ReviewManager.shared.trackSession()
 
-    return true
-
+      return true
   }
-    //FUNCION PARA RECIBIR NOTIFICACIONES PUSH ***********
+
+  // 👇 3. AÑADE ESTA FUNCIÓN OBLIGATORIA DEL DELEGADO
+  /// Esta función se llama automáticamente cada vez que el token de FCM se crea por primera vez
+  /// o cuando se actualiza. Es el lugar perfecto para obtener el token.
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+      guard let token = fcmToken else {
+          print("⚠️ El token de FCM es nulo.")
+          return
+      }
+      
+      print("🔔 ¡Token de FCM obtenido/actualizado!: \(token)")
+      
+      // TODO: Aquí es donde deberías enviar este 'token' a tu backend/servidor
+      // para asociarlo con el usuario actual y poder enviarle notificaciones.
+      // Ejemplo: sendTokenToServer(token)
+  }
+
+    // MARK: - Métodos de Notificaciones (Tu código original, está perfecto)
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
          completionHandler([.banner, .sound])
      }
@@ -40,9 +50,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
      func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
          completionHandler()
      }
-    //*****************************************************
     
-    //AUTORIZACION AL USARIO A RECIBIR NOTIFICACIONES**********
     private func requestAuthorizationForPushNotification(application: UIApplication) {
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
@@ -52,44 +60,39 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
            Messaging.messaging().apnsToken = deviceToken
        }
-    //********************************************************
 }
+
 import SwiftUI
 import GoogleMobileAds
-@main
 
+@main
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    // 👇 1. AÑADE EL GESTOR DE VERSIONES AQUÍ
-      @StateObject private var versionManager = VersionCheckManager()
-    init() {
-      //  MobileAds.shared.start(completionHandler: nil)
-       }
-    @StateObject private var userSession = UserSession()
     
-    // 👇 AÑADIDO: Crea una única instancia del gestor de estado.
-       @StateObject private var adState = AdState()
+    // Tu lógica de actualización forzada (está perfecta)
+    @StateObject private var versionManager = VersionCheckManager()
+
+    // Tus otras propiedades de estado (están perfectas)
+    @StateObject private var userSession = UserSession()
+    @StateObject private var adState = AdState()
+    
+    init() { }
+    
     var body: some Scene {
         WindowGroup {
-          //  MenuView()
-          //  DolarAlDiaView()
             ContentView()
                 .environmentObject(userSession)
-            // 👇 Inyecta el gestor de estado en el entorno de la app.
                 .environmentObject(adState)
-            // 👇 2. AÑADE LA COMPROBACIÓN Y LA PANTALLA DE ACTUALIZACIÓN AQUÍ
-                       .onAppear {
-                           // Le pedimos a Remote Config que cargue los valores y, cuando termine,
-                           // que ejecute la comprobación de la versión.
-                           RemoteConfigManager.shared.fetchConfig {
-                               versionManager.checkAppVersion()
-                           }
-                       }
-                       .fullScreenCover(isPresented: $versionManager.needsUpdate) {
-                           // Si 'needsUpdate' se vuelve true, esta vista bloqueará toda la app.
-                           ForceUpdateView(updateURL: versionManager.appStoreURL)
-                       }
-                   
+                
+            // Tu lógica de comprobación de versión (está perfecta)
+            .onAppear {
+                RemoteConfigManager.shared.fetchConfig {
+                    versionManager.checkAppVersion()
+                }
+            }
+            .fullScreenCover(isPresented: $versionManager.needsUpdate) {
+                ForceUpdateView(updateURL: versionManager.appStoreURL)
+            }
         }
     }
 }

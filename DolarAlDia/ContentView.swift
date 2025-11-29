@@ -198,26 +198,37 @@ struct ContentView: View {
         // =================================================================
         .onChange(of: scenePhase) { oldPhase, newPhase in
             // Esta condición se cumplirá cuando la app pase a primer plano.
-            // Es el momento perfecto y seguro para ejecutar nuestra lógica.
             if newPhase == .active {
-                
-                // 👇 AÑADIDO: Cada vez que la app se activa, comprueba el estado de la recompensa.
-                adState.updateAdFreeStatus()
-                
-                // 👇 MODIFICADO: Solo muestra el intersticial si NO estamos en período sin anuncios.
-              //  if !adState.isAdFree {
-                   // showLaunchAd() //activar el anuncio intersticial************
-             //   }
-                
-                if !adState.isAdFree && RemoteConfigManager.shared.showInterstitialAd {
-                         // Comentado temporalmente como pediste, pero aquí es donde va
-                          showLaunchAd()
-                     }
-                
-                //Funcion para pedir los permisos
-                requestTrackingPermission()
-                // Lógica de la reseña
-                ReviewManager.shared.trackSession()
+                   
+                   print("--- 🔍 DIAGNÓSTICO DE ANUNCIO INTERSTICIAL 🔍 ---")
+                   
+                   // Comprobamos cada condición por separado
+                   let isAdFree = adState.isAdFree
+                   let remoteConfigAllowsAd = RemoteConfigManager.shared.showInterstitialAd
+                   
+                   print("DEBUG: ¿Está en período sin anuncios? (isAdFree): \(isAdFree)")
+                   print("DEBUG: ¿Remote Config permite el anuncio? (showInterstitialAd): \(remoteConfigAllowsAd)")
+                   
+                   // Evaluamos la condición completa
+                   if !isAdFree && remoteConfigAllowsAd {
+                       print("DEBUG: ✅ Las condiciones se cumplen. Se llamará a showLaunchAd().")
+                       showLaunchAd()
+                   } else {
+                       print("DEBUG: ❌ Las condiciones NO se cumplen. Razón:")
+                       if isAdFree {
+                           print("      - La app está en período sin anuncios (recompensa activa).")
+                       }
+                       if !remoteConfigAllowsAd {
+                           print("      - Remote Config tiene 'showInterstitialAd' en 'false'.")
+                       }
+                   }
+                   
+                   // El resto de tu código no cambia
+                   adState.updateAdFreeStatus()
+                   requestTrackingPermission()
+                   ReviewManager.shared.trackSession()
+                   
+                   print("--- FIN DEL DIAGNÓSTICO ---")
             }
         }
         

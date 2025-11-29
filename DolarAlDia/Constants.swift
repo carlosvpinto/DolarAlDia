@@ -10,13 +10,14 @@ import Foundation
 
 struct Constants {
     //Id de Publicidades ADS*******************,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-    static let adUnitIDBanner = "ca-app-pub-3940256099942544/2934735716" // Desarrollo
-    static let adUnitIDInterstitial = "ca-app-pub-3940256099942544/4411468910" // Desarrollo
-    static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313" //Desarrollo
+   // static let adUnitIDBanner = "ca-app-pub-3940256099942544/2934735716" // Desarrollo
+   // static let adUnitIDInterstitial = "ca-app-pub-3940256099942544/4411468910" // Desarrollo
+   // static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313" //Desarrollo
     
-   // static let adUnitIDBanner = "ca-app-pub-3265312813580307/4069312956" // Produccion******
-   // static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/2819810465" // Produccion
-   // static let adUnitIDRewardedVideo = "ca-app-pub-3265312813580307/9272278997" //Produccion
+    static let adUnitIDBanner = "ca-app-pub-3265312813580307/4069312956" // Produccion******
+    //static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/2819810465" // Produccion ca-app-pub-3265312813580307/3273660478
+    static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/3273660478" // Produccion 
+    static let adUnitIDRewardedVideo = "ca-app-pub-3265312813580307/9272278997" //Produccion
     
     
     static let HISTORIA_BCV = "HISTORIA_BCV"

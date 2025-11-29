@@ -87,6 +87,7 @@
 		DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCVHistoryModels.swift; sourceTree = "<group>"; };
 		DB87F2B22EC16E7E0095A055 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DB87F2D82EC3EFFD0095A055 /* RemoteConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigManager.swift; sourceTree = "<group>"; };
+		DB89A88E2EDB61F4004353CE /* Untitled 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Untitled 2.swift"; sourceTree = "<group>"; };
 		DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotonInfoPrecio.swift; sourceTree = "<group>"; };
 		DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPersonal.swift; sourceTree = "<group>"; };
 		DBA82F832CFEB876004A0C4F /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
@@ -153,6 +154,7 @@
 		DB42B28D2EBEF543005C054B /* AnunciosAds */ = {
 			isa = PBXGroup;
 			children = (
+				DB89A88E2EDB61F4004353CE /* Untitled 2.swift */,
 				DB42B2912EBF06CA005C054B /* RewardStatusView.swift */,
 				DB87F2D82EC3EFFD0095A055 /* RemoteConfigManager.swift */,
 				DB42B28E2EBEFA5F005C054B /* AdState.swift */,
@@ -517,7 +519,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
@@ -537,7 +539,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -553,7 +555,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
 				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
@@ -572,7 +574,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6;
+				MARKETING_VERSION = 2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
