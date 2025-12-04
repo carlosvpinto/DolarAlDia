@@ -19,6 +19,7 @@ class RemoteConfigManager {
            case showBannerAd
            case showRewardedAd
            case ios_minimum_required_version // <-- Nueva clave
+           case showAppOpenAd // <-- 👇 1. AÑADE LA NUEVA CLAVE AQUÍ
        }
     
     private init() {
@@ -34,7 +35,11 @@ class RemoteConfigManager {
             ParameterKeys.showBannerAd.rawValue: true as NSObject,
             ParameterKeys.showRewardedAd.rawValue: true as NSObject,
             // 👇 2. AÑADE UN VALOR POR DEFECTO PARA LA VERSIÓN
-            ParameterKeys.ios_minimum_required_version.rawValue: "1.0" as NSObject
+            ParameterKeys.ios_minimum_required_version.rawValue: "1.0" as NSObject,
+            // 👇 2. AÑADE UN VALOR POR DEFECTO PARA EL NUEVO ANUNCIO
+            ParameterKeys.showAppOpenAd.rawValue: true as NSObject
+            
+            
         ]
         remoteConfig.setDefaults(defaultValues)
     }
@@ -89,6 +94,11 @@ class RemoteConfigManager {
 
     //    Esta propiedad nos dará directamente la versión requerida como un String.
     var minimumRequiredVersion: String {
-        remoteConfig.configValue(forKey: ParameterKeys.ios_minimum_required_version.rawValue).stringValue ?? "1.0"
+        remoteConfig.configValue(forKey: ParameterKeys.ios_minimum_required_version.rawValue).stringValue
+    }
+    
+    // 👇 3. AÑADE LA NUEVA PROPIEDAD COMPUTADA
+    var showAppOpenAd: Bool {
+        remoteConfig.configValue(forKey: ParameterKeys.showAppOpenAd.rawValue).boolValue
     }
 }

@@ -18,6 +18,8 @@ struct ContentView: View {
        //    Esto conecta la vista con el coordinador. Ahora la vista se actualizará
        //    automáticamente cuando la propiedad @Published 'isReady' cambie.
        @ObservedObject private var rewardedAdCoordinator = RewardedAdCoordinator.shared
+    
+    
    
     
     // ----- ESTADO PRINCIPAL DE LA APLICACIÓN -----
@@ -37,12 +39,15 @@ struct ContentView: View {
     
     // 👇 AÑADIDO: Nuevo estado para controlar la alerta del anuncio recompensado.
     @State private var mostrarAlertaRecompensa = false
+    @State private var showPaywall = false
+
     
     // MARK: - Usamos el UserSession compartido
     @EnvironmentObject var userSession: UserSession
     
     // 👇 AÑADIDO: Accede al gestor de estado de anuncios desde el entorno.
     @EnvironmentObject var adState: AdState
+    @EnvironmentObject var storeManager: StoreKitManager // Accedemos
     
     
     // =================================================================
@@ -200,35 +205,14 @@ struct ContentView: View {
             // Esta condición se cumplirá cuando la app pase a primer plano.
             if newPhase == .active {
                    
-                   print("--- 🔍 DIAGNÓSTICO DE ANUNCIO INTERSTICIAL 🔍 ---")
-                   
-                   // Comprobamos cada condición por separado
-                   let isAdFree = adState.isAdFree
-                   let remoteConfigAllowsAd = RemoteConfigManager.shared.showInterstitialAd
-                   
-                   print("DEBUG: ¿Está en período sin anuncios? (isAdFree): \(isAdFree)")
-                   print("DEBUG: ¿Remote Config permite el anuncio? (showInterstitialAd): \(remoteConfigAllowsAd)")
-                   
-                   // Evaluamos la condición completa
-                   if !isAdFree && remoteConfigAllowsAd {
-                       print("DEBUG: ✅ Las condiciones se cumplen. Se llamará a showLaunchAd().")
-                       showLaunchAd()
-                   } else {
-                       print("DEBUG: ❌ Las condiciones NO se cumplen. Razón:")
-                       if isAdFree {
-                           print("      - La app está en período sin anuncios (recompensa activa).")
-                       }
-                       if !remoteConfigAllowsAd {
-                           print("      - Remote Config tiene 'showInterstitialAd' en 'false'.")
-                       }
-                   }
+          
                    
                    // El resto de tu código no cambia
                    adState.updateAdFreeStatus()
                    requestTrackingPermission()
                    ReviewManager.shared.trackSession()
                    
-                   print("--- FIN DEL DIAGNÓSTICO ---")
+                  
             }
         }
         

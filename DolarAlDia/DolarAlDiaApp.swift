@@ -22,8 +22,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
       
       requestAuthorizationForPushNotification(application: application)
 
+      AppOpenAdCoordinator.shared.loadAd()
       return true
   }
+    
+    // 👇 2. AÑADE ESTA NUEVA FUNCIÓN
+    /// Esta función se llama cada vez que la app vuelve a primer plano.
+    /// Es el momento perfecto para intentar mostrar el anuncio de inicio.
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        AppOpenAdCoordinator.shared.showAdIfReady()
+    }
 
   // 👇 3. AÑADE ESTA FUNCIÓN OBLIGATORIA DEL DELEGADO
   /// Esta función se llama automáticamente cada vez que el token de FCM se crea por primera vez
@@ -69,6 +77,9 @@ import GoogleMobileAds
 struct DolarAlDiaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    // Inicializamos el Manager una sola vez para toda la app
+    @StateObject private var storeManager = StoreKitManager()
+    
     // Tu lógica de actualización forzada (está perfecta)
     @StateObject private var versionManager = VersionCheckManager()
 
@@ -83,11 +94,27 @@ struct DolarAlDiaApp: App {
             ContentView()
                 .environmentObject(userSession)
                 .environmentObject(adState)
-                
+                .environmentObject(storeManager) // Lo hacemos disponible a todas las vistas
             // Tu lógica de comprobación de versión (está perfecta)
+                .task {
+                    // Inicializar StoreKit
+                    await storeManager.updateCustomerProductStatus()
+                    
+                    // 2. CONEXIÓN CLAVE: Le decimos al AdState que vigile al StoreManager
+                    adState.configure(with: storeManager)
+                }
             .onAppear {
+                
+                // Configura AdState en el coordinador
+                AppOpenAdCoordinator.shared.configure(with: adState)
+                
                 RemoteConfigManager.shared.fetchConfig {
                     versionManager.checkAppVersion()
+                    
+                    Task {
+                        // Tarea Asíncrona 1: Actualizar el estado de la compra
+                        await storeManager.updateCustomerProductStatus()
+                    }
                 }
             }
             .fullScreenCover(isPresented: $versionManager.needsUpdate) {

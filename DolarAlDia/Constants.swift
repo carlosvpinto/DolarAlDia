@@ -9,16 +9,30 @@ import Foundation
 // Constants.swift
 
 struct Constants {
+    
     //Id de Publicidades ADS*******************,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-   // static let adUnitIDBanner = "ca-app-pub-3940256099942544/2934735716" // Desarrollo
-   // static let adUnitIDInterstitial = "ca-app-pub-3940256099942544/4411468910" // Desarrollo
-   // static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313" //Desarrollo
-    
-    static let adUnitIDBanner = "ca-app-pub-3265312813580307/4069312956" // Produccion******
-    //static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/2819810465" // Produccion ca-app-pub-3265312813580307/3273660478
-    static let adUnitIDInterstitial = "ca-app-pub-3265312813580307/3273660478" // Produccion 
-    static let adUnitIDRewardedVideo = "ca-app-pub-3265312813580307/9272278997" //Produccion
-    
+       #if DEBUG
+       // =============================================================
+       // IDs de DESARROLLO (Prueba)
+       // Se usan automáticamente cuando compilas desde Xcode.
+       // Siempre mostrarán anuncios de prueba para proteger tu cuenta.
+       // =============================================================
+       static let adUnitIDBanner        = "ca-app-pub-3940256099942544/2934735716"
+       static let adUnitIDInterstitial  = "ca-app-pub-3940256099942544/4411468910"
+       static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313"
+       static let adUnitIDAppOpen       = "ca-app-pub-3940256099942544/5662855259"
+
+       #else
+       // =============================================================
+       // IDs de PRODUCCIÓN (Reales)
+       // Se usan automáticamente cuando archivas la app para la App Store.
+       // =============================================================
+       static let adUnitIDBanner        = "ca-app-pub-3265312813580307/4069312956"
+       static let adUnitIDInterstitial  = "ca-app-pub-3265312813580307/3273660478"
+       static let adUnitIDRewardedVideo = "ca-app-pub-3265312813580307/9272278997"
+       static let adUnitIDAppOpen       = "ca-app-pub-3265312813580307/2819810465"
+       #endif
+  
     
     static let HISTORIA_BCV = "HISTORIA_BCV"
     static let HISTORIA_PARALELO = "HISTORIA_PARALELO"

@@ -36,6 +36,9 @@
 		DB4F03F22E373A6400A04941 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4F03F12E373A6400A04941 /* MainTabView.swift */; };
 		DB59BB802E4D13D3005BB7F6 /* GlowOnUpdateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB59BB7F2E4D13CF005BB7F6 /* GlowOnUpdateModifier.swift */; };
 		DB59BB8C2E4D5444005BB7F6 /* PlatformDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB59BB8B2E4D5440005BB7F6 /* PlatformDataCache.swift */; };
+		DB5B1D162EE1054800A403A7 /* StoreKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5B1D132EE103DA00A403A7 /* StoreKitManager.swift */; };
+		DB5B1D172EE1054F00A403A7 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5B1D142EE103F500A403A7 /* PaywallView.swift */; };
+		DB5B1D1A2EE1442100A403A7 /* DolarPro.storekit in Resources */ = {isa = PBXBuildFile; fileRef = DB5B1D192EE1442100A403A7 /* DolarPro.storekit */; };
 		DB5D28CD2E38600C0080733F /* DollarDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5D28CC2E38600B0080733F /* DollarDataCache.swift */; };
 		DB5D28CF2E388E3C0080733F /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5D28CE2E388E3C0080733F /* LoadingView.swift */; };
 		DB5D28D12E391EBE0080733F /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5D28D02E391EB70080733F /* HapticManager.swift */; };
@@ -47,6 +50,7 @@
 		DB87F2D92EC3F0000095A055 /* RemoteConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87F2D82EC3EFFD0095A055 /* RemoteConfigManager.swift */; };
 		DB87F2DB2EC3F1130095A055 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = DB87F2DA2EC3F1130095A055 /* FirebaseRemoteConfig */; };
 		DB93D2802E9390310085BB8A /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = DB93D27F2E9390310085BB8A /* GoogleMobileAds */; };
+		DB9527E32EDB697A000FFE24 /* AppOpenAdCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9527E22EDB6977000FFE24 /* AppOpenAdCoordinator.swift */; };
 		DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */; };
 		DBA82F812CFE44CE004A0C4F /* TextFieldPersonal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */; };
 		DBA82F842CFEB876004A0C4F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA82F832CFEB876004A0C4F /* Model.swift */; };
@@ -78,6 +82,9 @@
 		DB4F03F12E373A6400A04941 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		DB59BB7F2E4D13CF005BB7F6 /* GlowOnUpdateModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlowOnUpdateModifier.swift; sourceTree = "<group>"; };
 		DB59BB8B2E4D5440005BB7F6 /* PlatformDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformDataCache.swift; sourceTree = "<group>"; };
+		DB5B1D132EE103DA00A403A7 /* StoreKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitManager.swift; sourceTree = "<group>"; };
+		DB5B1D142EE103F500A403A7 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		DB5B1D192EE1442100A403A7 /* DolarPro.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = DolarPro.storekit; sourceTree = "<group>"; };
 		DB5D28CC2E38600B0080733F /* DollarDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DollarDataCache.swift; sourceTree = "<group>"; };
 		DB5D28CE2E388E3C0080733F /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		DB5D28D02E391EB70080733F /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
@@ -87,7 +94,7 @@
 		DB7C632A2DCFCAFB001CC983 /* BCVHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCVHistoryModels.swift; sourceTree = "<group>"; };
 		DB87F2B22EC16E7E0095A055 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DB87F2D82EC3EFFD0095A055 /* RemoteConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigManager.swift; sourceTree = "<group>"; };
-		DB89A88E2EDB61F4004353CE /* Untitled 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Untitled 2.swift"; sourceTree = "<group>"; };
+		DB9527E22EDB6977000FFE24 /* AppOpenAdCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenAdCoordinator.swift; sourceTree = "<group>"; };
 		DBA82F732CFD72DB004A0C4F /* BotonInfoPrecio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotonInfoPrecio.swift; sourceTree = "<group>"; };
 		DBA82F802CFE44CE004A0C4F /* TextFieldPersonal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPersonal.swift; sourceTree = "<group>"; };
 		DBA82F832CFEB876004A0C4F /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
@@ -154,7 +161,7 @@
 		DB42B28D2EBEF543005C054B /* AnunciosAds */ = {
 			isa = PBXGroup;
 			children = (
-				DB89A88E2EDB61F4004353CE /* Untitled 2.swift */,
+				DB9527E22EDB6977000FFE24 /* AppOpenAdCoordinator.swift */,
 				DB42B2912EBF06CA005C054B /* RewardStatusView.swift */,
 				DB87F2D82EC3EFFD0095A055 /* RemoteConfigManager.swift */,
 				DB42B28E2EBEFA5F005C054B /* AdState.swift */,
@@ -175,6 +182,15 @@
 				DB42B2512EBE915F005C054B /* ApiNetworkDolarAlDia.swift */,
 			);
 			path = Apillamadas;
+			sourceTree = "<group>";
+		};
+		DB6E6F572EE101E9008BB18E /* Suscripcion */ = {
+			isa = PBXGroup;
+			children = (
+				DB5B1D142EE103F500A403A7 /* PaywallView.swift */,
+				DB5B1D132EE103DA00A403A7 /* StoreKitManager.swift */,
+			);
+			path = Suscripcion;
 			sourceTree = "<group>";
 		};
 		DBA82F722CFD7296004A0C4F /* Componets */ = {
@@ -217,6 +233,8 @@
 		DBF667242CFC369100394884 = {
 			isa = PBXGroup;
 			children = (
+				DB5B1D192EE1442100A403A7 /* DolarPro.storekit */,
+				DB6E6F572EE101E9008BB18E /* Suscripcion */,
 				DB1F28A42EC0FF6400FC314F /* MoreMenuView.swift */,
 				DB1F28A22EC0FEE300FC314F /* SubscriptionStatusView.swift */,
 				DB42B2902EBF06A8005C054B /* Apillamadas */,
@@ -284,7 +302,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1610;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					DBF6672C2CFC369100394884 = {
 						CreatedOnToolsVersion = 16.1;
@@ -319,6 +337,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB5B1D1A2EE1442100A403A7 /* DolarPro.storekit in Resources */,
 				DB87F2C32EC16E7E0095A055 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -366,6 +385,7 @@
 				DB42B27E2EBE915F005C054B /* BannerAdView.swift in Sources */,
 				DB42B2862EBE915F005C054B /* InterstitialAdCoordinator.swift in Sources */,
 				DB42B28A2EBE915F005C054B /* RewardedAdCoordinator.swift in Sources */,
+				DB5B1D162EE1054800A403A7 /* StoreKitManager.swift in Sources */,
 				DB251C0D2D064BAD0000D82F /* MenuView.swift in Sources */,
 				DB1F28A32EC0FEE900FC314F /* SubscriptionStatusView.swift in Sources */,
 				DB251C072D0573270000D82F /* ResultSheet.swift in Sources */,
@@ -373,9 +393,11 @@
 				DB7C632B2DCFCB0A001CC983 /* BCVHistoryModels.swift in Sources */,
 				DBBEF0E22D11F46F00ED3FA1 /* MenuSliderView.swift in Sources */,
 				DB251C112D06CFDE0000D82F /* MonitorListViewModel.swift in Sources */,
+				DB5B1D172EE1054F00A403A7 /* PaywallView.swift in Sources */,
 				DBA9BBEC2E4EDD8400368624 /* PlatformRatesView.swift in Sources */,
 				DB42B2922EBF06CD005C054B /* RewardStatusView.swift in Sources */,
 				DBA82F742CFD72DB004A0C4F /* BotonInfoPrecio.swift in Sources */,
+				DB9527E32EDB697A000FFE24 /* AppOpenAdCoordinator.swift in Sources */,
 				DB1F28A82EC1676300FC314F /* ExtendedFAB.swift in Sources */,
 				DBC0809E2D0920D600BF2923 /* UserData.swift in Sources */,
 				DBC080A02D09210400BF2923 /* UserDataManager.swift in Sources */,
@@ -428,6 +450,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -451,6 +474,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -491,6 +515,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -507,6 +532,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -519,10 +545,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
-				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DolarAlDia/Info.plist;
@@ -539,7 +564,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7;
+				MARKETING_VERSION = 2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -555,9 +580,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DolarAlDia/DolarAlDia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_ASSET_PATHS = "\"DolarAlDia/Preview Content\"";
-				DEVELOPMENT_TEAM = NAY94AP2YJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DolarAlDia/Info.plist;
@@ -574,7 +598,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7;
+				MARKETING_VERSION = 2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = Desoftsis.DolarAlDia;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
