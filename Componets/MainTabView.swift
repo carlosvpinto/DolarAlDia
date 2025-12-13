@@ -49,9 +49,9 @@ struct MainTabView: View {
                     // El ícono de tres rayas y el nuevo texto
                     Label("Más", systemImage: "line.3.horizontal")
                 }
-                .tag(Constants.MAS_OPCIONES) // Asegúrate de tener esta constante
+                .tag(Constants.MAS_OPCIONES)
             
-            // Pestaña 4: Historia BCV (Sin cambios)
+    
             BCVHistoryView(
                 imgUrl: "https://res.cloudinary.com/dcpyfqx87/image/upload/v1729921478/monitors/public_id:bcv.webp",
                 navigationTitle: "Historia Dólar BCV",

@@ -41,12 +41,7 @@ struct MoreMenuView: View {
 
                 // SECCIÓN GENERAL
                 Section(header: Text("General")) {
-                    // Opción 1: Bancos
-                    NavigationLink(destination: MonitorBcvListView()) {
-                        Label("Bancos", systemImage: "dollarsign.circle")
-                    }
                     
-                    // Opción 2: Estado de la Suscripción
                     // (Si es Premium dice "Activo", si no dice "Gratis")
                     NavigationLink(destination: SubscriptionStatusView()) {
                         HStack {
@@ -62,6 +57,14 @@ struct MoreMenuView: View {
                                 )
                         }
                     }
+                    
+                    // Opción 1: Bancos
+                    NavigationLink(destination: MonitorBcvListView()) {
+                        Label("Bancos", systemImage: "dollarsign.circle")
+                    }
+                    
+                    // Opción 2: Estado de la Suscripción
+              
                 }
                 
                 // --- AÑADE AQUÍ FUTURAS OPCIONES ---

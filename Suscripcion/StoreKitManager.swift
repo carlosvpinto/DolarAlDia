@@ -18,10 +18,13 @@ class StoreKitManager: ObservableObject {
     
     @Published var products: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
-    @Published var isPremiumUser: Bool = false
+  //  @Published var isPremiumUser: Bool = false
     
     // NUEVO: Guardaremos la fecha de vencimiento aquí
      @Published var subscriptionExpirationDate: Date? = nil
+    
+    // Al iniciar, leemos este valor por defecto para ser ultra rápidos
+       @Published var isPremiumUser: Bool = UserDefaults.standard.bool(forKey: "isProCache")
     
     private var updates: Task<Void, Never>? = nil
 
@@ -78,25 +81,29 @@ class StoreKitManager: ObservableObject {
         }
     }
 
-    // MODIFICADO: Capturar la fecha de expiración
-       func updateCustomerProductStatus() async {
-           var purchasedIds: Set<String> = []
-           var expirationDate: Date? = nil // Variable temporal
-           
-           for await result in Transaction.currentEntitlements {
-               if case .verified(let transaction) = result {
-                   // Si es del tipo suscripción, guardamos su fecha
-                   if transaction.productType == .autoRenewable {
-                       purchasedIds.insert(transaction.productID)
-                       expirationDate = transaction.expirationDate
-                   }
-               }
-           }
-           
-           self.purchasedProductIDs = purchasedIds
-           self.isPremiumUser = !purchasedIds.isEmpty
-           self.subscriptionExpirationDate = expirationDate // Guardamos la fecha
-       }
+    func updateCustomerProductStatus() async {
+        var purchasedIds: Set<String> = []
+        var expirationDate: Date? = nil
+        
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result {
+                if transaction.productType == .autoRenewable {
+                    purchasedIds.insert(transaction.productID)
+                    expirationDate = transaction.expirationDate
+                }
+            }
+        }
+        
+        self.purchasedProductIDs = purchasedIds
+        self.subscriptionExpirationDate = expirationDate
+        
+        // LÓGICA DE CACHÉ
+        let isPro = !purchasedIds.isEmpty
+        self.isPremiumUser = isPro
+        
+        // Guardamos en memoria local para la próxima vez que abra la app
+        UserDefaults.standard.set(isPro, forKey: "isProCache")
+    }
     
     // 4. Restaurar Compras (Obligatorio tener el botón)
     func restorePurchases() async {

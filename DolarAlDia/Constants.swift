@@ -20,7 +20,7 @@ struct Constants {
        static let adUnitIDBanner        = "ca-app-pub-3940256099942544/2934735716"
        static let adUnitIDInterstitial  = "ca-app-pub-3940256099942544/4411468910"
        static let adUnitIDRewardedVideo = "ca-app-pub-3940256099942544/1712485313"
-       static let adUnitIDAppOpen       = "ca-app-pub-3940256099942544/5662855259"
+       static let adUnitIDAppOpen       = "ca-app-pub-3940256099942544/9257395921"
 
        #else
        // =============================================================

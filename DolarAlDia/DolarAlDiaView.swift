@@ -52,8 +52,13 @@ struct DolarAlDiaView: View {
     
 
     @EnvironmentObject var adState: AdState // Necesitamos acceso directo aquí
+    // 👇 AÑADIDO: Necesitamos esto para saber si pagó la suscripción
+        @EnvironmentObject var storeManager: StoreKitManager // <--- CAMBIO 1
     
-   
+    // Propiedad computada para simplificar la lógica
+       private var isPremium: Bool {
+           return storeManager.isPremiumUser || adState.isAdFree
+       }
     
     // MARK: - Propiedades Computadas (Sin cambios)
     var placeholderMoneda: String {
@@ -150,7 +155,8 @@ struct DolarAlDiaView: View {
         .ignoresSafeArea(.keyboard)
     }
     private var logoView: some View {
-            Image("logoredondo")
+           // Usamos una lógica ternaria simple: Si es premium -> logo_premium, si no -> logoredondo
+           Image(isPremium ? "logo_premiun" : "logoredondo") // <--- CAMBIO 2
                 .resizable()
                 .scaledToFit()
                 .frame(width: 50, height: 50)
